@@ -1,0 +1,37 @@
+/* =========================
+   GLOBAL RESET + TYPOGRAPHY
+========================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    height: 100%;
+}
+
+body {
+    font-family: 'Orbitron', sans-serif;
+    background: #15161d;
+    color: #f1f3f7;
+}
+
+/* Utility classes */
+.pill {
+    border-radius: 999px;
+}
+
+.glass {
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+.no-select {
+    user-select: none;
+}

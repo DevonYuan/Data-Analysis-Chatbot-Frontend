@@ -1,0 +1,40 @@
+/* =========================
+   VISUAL EFFECT UTILITIES
+========================= */
+
+/* Soft radial glow layer */
+.glow-layer {
+    content: "";
+    position: absolute;
+    inset: -20%;
+    filter: blur(45px);
+    opacity: 0.7;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Faint grid/data texture */
+.grid-layer {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.028) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.028) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mask-image: radial-gradient(circle at center, black, transparent 72%);
+    opacity: 0.15;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Glass blur utility */
+.blur-14 {
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+.blur-18 {
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}

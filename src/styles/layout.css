@@ -1,0 +1,68 @@
+/* =========================
+   LAYOUT UTILITIES
+========================= */
+
+/* Fullscreen page wrapper */
+.fullscreen {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Centered flex column */
+.flex-col-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Centered flex row */
+.flex-row-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Space-between row */
+.flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Generic flex column */
+.flex-col {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Generic flex row */
+.flex-row {
+    display: flex;
+    flex-direction: row;
+}
+
+/* Page padding utility */
+.page-padding {
+    padding: 48px;
+}
+
+/* Sidebar layout */
+.sidebar-layout {
+    width: 280px;
+    padding: 32px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+/* Main content layout */
+.main-panel {
+    flex: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 48px;
+}
