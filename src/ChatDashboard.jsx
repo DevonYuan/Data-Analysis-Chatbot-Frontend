@@ -54,6 +54,16 @@ export default function ChatDashboard() {
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
 
+    const username = localStorage.getItem("username") || "";
+
+    function getAvatarInitials(email) {
+        if (!email) return "??";
+        const firstChar = email.charAt(0).toUpperCase();
+        const atIndex = email.indexOf("@");
+        const afterAtChar = atIndex !== -1 ? email.charAt(atIndex + 1).toUpperCase() : "";
+        return firstChar + afterAtChar;
+    }
+
     useEffect(() => {
         if (messagesEndRef.current) {
             messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -276,8 +286,8 @@ export default function ChatDashboard() {
                 </div>
 
                 <div className="sidebar-user">
-                    <div className="sidebar-user-name">Devon</div>
-                    <div className="sidebar-user-avatar">DY</div>
+                    <div className="sidebar-user-name">{username}</div>
+                    <div className="sidebar-user-avatar">{getAvatarInitials(username)}</div>
                 </div>
 
             </aside>

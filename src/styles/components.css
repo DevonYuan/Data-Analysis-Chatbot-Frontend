@@ -116,3 +116,43 @@
     transform: translateX(4px);
     background: rgba(255, 255, 255, 0.12);
 }
+
+/* -------------------------
+   STATUS TOAST
+------------------------- */
+
+.status-toast {
+    position: fixed;
+    top: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 14px 24px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 999px;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    color: #f1f3f7;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 1000;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.status-toast-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #8ab4ff;
+}
+
+.status-toast-error {
+    border-color: rgba(255, 107, 107, 0.4);
+    background: rgba(255, 107, 107, 0.1);
+}
+
+.status-toast-error .status-toast-dot {
+    background: #ff6b6b;
+}
