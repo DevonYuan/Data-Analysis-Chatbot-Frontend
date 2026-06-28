@@ -3,6 +3,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { getChats, createChat, deleteChat } from "./api/chats";
 import { sendMessage, getMessages } from "./api/messages";
+import { uploadFile } from "./api/upload";
 import { useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -49,7 +50,9 @@ export default function ChatDashboard() {
     const [chatToDelete, setChatToDelete] = useState(null);
     const [isDeletingChat, setIsDeletingChat] = useState(false);
     const [shouldSendOnCreate, setShouldSendOnCreate] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
     const messagesEndRef = useRef(null);
+    const fileInputRef = useRef(null);
 
     useEffect(() => {
         if (messagesEndRef.current) {
@@ -135,6 +138,32 @@ export default function ChatDashboard() {
         setMessages((prev) => [...prev, { sender: "ai", text: reply }]);
 
         setInput("");
+    }
+
+    async function handleFileUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const username = localStorage.getItem("username");
+
+        if (!currentChat) {
+            alert("Please create or select a chat first before uploading a file.");
+            fileInputRef.current.value = "";
+            return;
+        }
+
+        try {
+            setIsUploading(true);
+            const result = await uploadFile(username, currentChat, file);
+            setMessages((prev) => [...prev, { sender: "user", text: `Uploaded file: ${file.filename}` }]);
+            setMessages((prev) => [...prev, { sender: "ai", text: `File uploaded successfully to bucket storage. You can now ask questions about your data.` }]);
+        } catch (error) {
+            console.error("Failed to upload file:", error);
+            alert(`Failed to upload file: ${error.message}`);
+        } finally {
+            setIsUploading(false);
+            fileInputRef.current.value = "";
+        }
     }
 
     useEffect(() => {
@@ -288,7 +317,20 @@ export default function ChatDashboard() {
                 </div>
 
                 <div className="chat-input-bar">
-                    <button className="chat-upload-button">+</button>
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        style={{ display: "none" }}
+                        accept=".csv,.tsv,.xlsx"
+                        onChange={handleFileUpload}
+                    />
+                    <button 
+                        className="chat-upload-button"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={isUploading}
+                    >
+                        {isUploading ? "..." : "+"}
+                    </button>
 
                     <input
                         className="chat-input"
