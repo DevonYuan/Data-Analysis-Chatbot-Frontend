@@ -334,7 +334,7 @@ export default function ChatDashboard() {
                         accept=".csv,.tsv,.xlsx"
                         onChange={handleFileUpload}
                     />
-                    <button 
+                    <button
                         className="chat-upload-button"
                         onClick={() => fileInputRef.current?.click()}
                         disabled={isUploading}
