@@ -102,7 +102,7 @@ export default function ChatDashboard() {
             setChats(updated)
 
             if (currentChat === chatToDelete) {
-                setCurrentChat(updated.length > 0 ? updated[0] : null)
+                setCurrentChat(null)
                 setMessages([])
             }
 
@@ -144,10 +144,6 @@ export default function ChatDashboard() {
             try {
                 const list = await getChats(username);
                 setChats(Array.isArray(list) ? list : []);
-
-                if (Array.isArray(list) && list.length > 0) {
-                    setCurrentChat(list[0]);
-                }
             } catch (error) {
                 console.error("Failed to load chats:", error);
                 setChats([]);
