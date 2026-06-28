@@ -13,32 +13,32 @@ import "./styles/layout.css"
 import "./styles/sidebar.css"
 
 function RequireAuth({ children }) {
-  const username = localStorage.getItem("username")
+    const username = localStorage.getItem("username")
 
-  if (!username) {
-    return <Navigate to="/login" replace />
-  }
+    if (!username) {
+        return <Navigate to="/login" replace />
+    }
 
-  return children
+    return children
 }
 
 export default function App() {
-  return (
-    <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/signup" element={<SignupPage />} />
+    return (
+        <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
 
-      <Route
-        path="/chat"
-        element={
-          <RequireAuth>
-            <ChatDashboard />
-          </RequireAuth>
-        }
-      />
+            <Route
+                path="/chat"
+                element={
+                    <RequireAuth>
+                        <ChatDashboard />
+                    </RequireAuth>
+                }
+            />
 
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
-  )
+            <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+    )
 }
