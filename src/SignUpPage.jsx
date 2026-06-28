@@ -38,7 +38,7 @@ export default function SignupPage() {
                 return
             }
 
-            if (message === "User created!" || message === "Registered successfully!") {
+            if (message === "User created!" || message === "Registered successfully!" || message === "Username is now registered!") {
                 localStorage.setItem("username", email)
                 showToast("Account created. Redirecting...", "success")
 

@@ -111,6 +111,13 @@
     box-shadow: 0 0 12px rgba(138, 180, 255, 0.35);
 }
 
+.chat-history-item.active {
+    background: rgba(138, 180, 255, 0.12);
+    border-color: rgba(138, 180, 255, 0.45);
+    box-shadow: 0 0 16px rgba(138, 180, 255, 0.3);
+    color: #8ab4ff;
+}
+
 /* Session label */
 .chat-history-label {
     pointer-events: none;

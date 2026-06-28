@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { getChats, createChat, deleteChat } from "./api/chats";
-import { sendMessage } from "./api/messages";
+import { sendMessage, getMessages } from "./api/messages";
 import { useNavigate } from "react-router-dom";
 import NewChatModal from "./NewChatModal";
 import ConfirmModal from "./ConfirmModal"
@@ -36,6 +36,76 @@ function BackgroundSphere() {
     );
 }
 
+function renderMarkdown(text) {
+    if (!text) return null;
+
+    const parts = text.split(/(```[\s\S]*?```)/g);
+
+    return parts.map((part, index) => {
+        if (part.startsWith("```") && part.endsWith("```")) {
+            const lines = part.slice(3, -3).trim().split("\n");
+            let language = "";
+            let codeLines = lines;
+            if (lines[0] && !lines[0].includes(" ") && lines[0].length < 15) {
+                language = lines[0];
+                codeLines = lines.slice(1);
+            }
+            const code = codeLines.join("\n");
+            return (
+                <pre key={index} style={{
+                    background: "rgba(0, 0, 0, 0.35)",
+                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                    borderRadius: "8px",
+                    padding: "12px",
+                    overflowX: "auto",
+                    fontFamily: "monospace",
+                    fontSize: "0.88rem",
+                    margin: "12px 0",
+                    color: "#a6daff"
+                }}>
+                    <code>{code}</code>
+                </pre>
+            );
+        }
+
+        const paragraphs = part.split(/\n/);
+        return paragraphs.map((paragraph, pIndex) => {
+            const trimmed = paragraph.trim();
+            if (!trimmed) return null;
+
+            const boldParts = paragraph.split(/\*\*([^*]+)\*\*/g);
+            const parsedContent = boldParts.map((bPart, i) => {
+                if (i % 2 === 1) {
+                    return <strong key={i}>{bPart}</strong>;
+                }
+                return bPart;
+            });
+
+            const listMatch = paragraph.match(/^(\d+\.\s+|\*\s+|-\s+)(.*)$/);
+            if (listMatch) {
+                const listContent = listMatch[2].split(/\*\*([^*]+)\*\*/g).map((bPart, i) => {
+                    if (i % 2 === 1) {
+                        return <strong key={i}>{bPart}</strong>;
+                    }
+                    return bPart;
+                });
+                return (
+                    <div key={`${index}-${pIndex}`} className="markdown-list-item" style={{ marginLeft: "16px", marginBottom: "6px" }}>
+                        {listMatch[1].trim().startsWith('*') || listMatch[1].trim().startsWith('-') ? "• " : listMatch[1]}
+                        {listContent}
+                    </div>
+                );
+            }
+
+            return (
+                <p key={`${index}-${pIndex}`} style={{ margin: "0 0 10px 0" }}>
+                    {parsedContent}
+                </p>
+            );
+        });
+    });
+}
+
 export default function ChatDashboard() {
     const [messages, setMessages] = useState([]);
     const [chats, setChats] = useState([]);
@@ -46,6 +116,14 @@ export default function ChatDashboard() {
     const [isCreatingChat, setIsCreatingChat] = useState(false);
     const [chatToDelete, setChatToDelete] = useState(null);
     const [isDeletingChat, setIsDeletingChat] = useState(false);
+    const [shouldSendOnCreate, setShouldSendOnCreate] = useState(false);
+    const messagesEndRef = useRef(null);
+
+    useEffect(() => {
+        if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [messages]);
 
     async function handleCreateChat(title) {
         const username = localStorage.getItem("username");
@@ -59,9 +137,18 @@ export default function ChatDashboard() {
             setChats(updated);
 
             setCurrentChat(title);
-            setMessages([]);
 
             setIsNewChatModalOpen(false);
+
+            if (shouldSendOnCreate && input.trim()) {
+                setMessages([{ sender: "user", text: input }]);
+                const reply = await sendMessage(username, title, input);
+                setMessages((prev) => [...prev, { sender: "ai", text: reply }]);
+                setInput("");
+            } else {
+                setMessages([]);
+            }
+            setShouldSendOnCreate(false);
         } catch (error) {
             console.error("Failed to create chat:", error);
         } finally {
@@ -100,7 +187,8 @@ export default function ChatDashboard() {
         const title = currentChat;
 
         if (!currentChat) {
-            alert("Please select or create a chat first.");
+            setShouldSendOnCreate(true);
+            setIsNewChatModalOpen(true);
             return;
         }
 
@@ -136,6 +224,27 @@ export default function ChatDashboard() {
 
         loadChats();
     }, []);
+
+    useEffect(() => {
+        if (!currentChat) {
+            setMessages([]);
+            return;
+        }
+
+        const username = localStorage.getItem("username");
+
+        async function loadMessages() {
+            try {
+                const list = await getMessages(username, currentChat);
+                setMessages(Array.isArray(list) ? list : []);
+            } catch (error) {
+                console.error("Failed to load messages:", error);
+                setMessages([]);
+            }
+        }
+
+        loadMessages();
+    }, [currentChat]);
 
     return (
         <div className="chat-container">
@@ -177,7 +286,10 @@ export default function ChatDashboard() {
 
                 <button
                     className="new-chat-button"
-                    onClick={() => setIsNewChatModalOpen(true)}
+                    onClick={() => {
+                        setShouldSendOnCreate(false);
+                        setIsNewChatModalOpen(true);
+                    }}
                 >
                     New Chat
                 </button>
@@ -186,10 +298,9 @@ export default function ChatDashboard() {
                     {chats.map((title, i) => (
                         <div
                             key={i}
-                            className="chat-history-item"
+                            className={`chat-history-item ${currentChat === title ? "active" : ""}`}
                             onClick={() => {
                                 setCurrentChat(title)
-                                setMessages([])
                             }}
                         >
                             <span className="chat-history-label">{title}</span>
@@ -225,12 +336,14 @@ export default function ChatDashboard() {
                     </Canvas>
                 </div>
 
-                <div className="chat-welcome-card">
-                    <h1 className="chat-welcome-title">Start a new analysis</h1>
-                    <p className="chat-welcome-subtitle">
-                        Upload a dataset or ask a question to begin exploring your data.
-                    </p>
-                </div>
+                {!currentChat && (
+                    <div className="chat-welcome-card">
+                        <h1 className="chat-welcome-title">Start a new analysis</h1>
+                        <p className="chat-welcome-subtitle">
+                            Upload a dataset or ask a question to begin exploring your data.
+                        </p>
+                    </div>
+                )}
 
                 <div className="chat-messages">
                     {messages.map((msg, i) => (
@@ -238,9 +351,10 @@ export default function ChatDashboard() {
                             key={i}
                             className={msg.sender === "user" ? "message-user" : "message-ai"}
                         >
-                            {msg.text}
+                            {renderMarkdown(msg.text)}
                         </div>
                     ))}
+                    <div ref={messagesEndRef} />
                 </div>
 
                 <div className="chat-input-bar">
@@ -251,6 +365,11 @@ export default function ChatDashboard() {
                         placeholder="Send a message..."
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                handleSend();
+                            }
+                        }}
                     />
 
                     <button className="chat-send-button" onClick={handleSend}>→</button>

@@ -14,3 +14,13 @@ export async function sendMessage(username, title, message) {
 
   return res.text();
 }
+
+export async function getMessages(username, title) {
+  const res = await fetch(
+    `${API}/get-messages?username=${encodeURIComponent(username)}&title=${encodeURIComponent(title)}`
+  );
+  if (!res.ok) {
+    throw new Error("Failed to fetch messages");
+  }
+  return res.json();
+}
