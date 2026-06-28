@@ -4,6 +4,8 @@ import { OrbitControls } from "@react-three/drei";
 import { getChats, createChat, deleteChat } from "./api/chats";
 import { sendMessage, getMessages } from "./api/messages";
 import { useNavigate } from "react-router-dom";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import NewChatModal from "./NewChatModal";
 import ConfirmModal from "./ConfirmModal"
 import "./styles/globals.css";
@@ -34,76 +36,6 @@ function BackgroundSphere() {
             />
         </mesh>
     );
-}
-
-function renderMarkdown(text) {
-    if (!text) return null;
-
-    const parts = text.split(/(```[\s\S]*?```)/g);
-
-    return parts.map((part, index) => {
-        if (part.startsWith("```") && part.endsWith("```")) {
-            const lines = part.slice(3, -3).trim().split("\n");
-            let language = "";
-            let codeLines = lines;
-            if (lines[0] && !lines[0].includes(" ") && lines[0].length < 15) {
-                language = lines[0];
-                codeLines = lines.slice(1);
-            }
-            const code = codeLines.join("\n");
-            return (
-                <pre key={index} style={{
-                    background: "rgba(0, 0, 0, 0.35)",
-                    border: "1px solid rgba(255, 255, 255, 0.1)",
-                    borderRadius: "8px",
-                    padding: "12px",
-                    overflowX: "auto",
-                    fontFamily: "monospace",
-                    fontSize: "0.88rem",
-                    margin: "12px 0",
-                    color: "#a6daff"
-                }}>
-                    <code>{code}</code>
-                </pre>
-            );
-        }
-
-        const paragraphs = part.split(/\n/);
-        return paragraphs.map((paragraph, pIndex) => {
-            const trimmed = paragraph.trim();
-            if (!trimmed) return null;
-
-            const boldParts = paragraph.split(/\*\*([^*]+)\*\*/g);
-            const parsedContent = boldParts.map((bPart, i) => {
-                if (i % 2 === 1) {
-                    return <strong key={i}>{bPart}</strong>;
-                }
-                return bPart;
-            });
-
-            const listMatch = paragraph.match(/^(\d+\.\s+|\*\s+|-\s+)(.*)$/);
-            if (listMatch) {
-                const listContent = listMatch[2].split(/\*\*([^*]+)\*\*/g).map((bPart, i) => {
-                    if (i % 2 === 1) {
-                        return <strong key={i}>{bPart}</strong>;
-                    }
-                    return bPart;
-                });
-                return (
-                    <div key={`${index}-${pIndex}`} className="markdown-list-item" style={{ marginLeft: "16px", marginBottom: "6px" }}>
-                        {listMatch[1].trim().startsWith('*') || listMatch[1].trim().startsWith('-') ? "• " : listMatch[1]}
-                        {listContent}
-                    </div>
-                );
-            }
-
-            return (
-                <p key={`${index}-${pIndex}`} style={{ margin: "0 0 10px 0" }}>
-                    {parsedContent}
-                </p>
-            );
-        });
-    });
 }
 
 export default function ChatDashboard() {
@@ -351,7 +283,9 @@ export default function ChatDashboard() {
                             key={i}
                             className={msg.sender === "user" ? "message-user" : "message-ai"}
                         >
-                            {renderMarkdown(msg.text)}
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                {msg.text || ""}
+                            </ReactMarkdown>
                         </div>
                     ))}
                     <div ref={messagesEndRef} />
