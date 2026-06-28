@@ -24,6 +24,7 @@
 /* Welcome card */
 .chat-welcome-card {
     margin: auto;
+    margin-top: 300px;
     text-align: center;
     max-width: 600px;
 }
