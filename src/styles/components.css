@@ -156,3 +156,59 @@
 .status-toast-error .status-toast-dot {
     background: #ff6b6b;
 }
+
+/* -------------------------
+   RATE LIMIT MODAL
+------------------------- */
+
+.rate-limit-modal {
+    /* Inherits .new-chat-modal layout but adds an amber tint */
+    border-color: rgba(255, 180, 60, 0.28) !important;
+    box-shadow:
+        0 24px 64px rgba(0, 0, 0, 0.45),
+        0 0 0 1px rgba(255, 180, 60, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+.rate-limit-icon {
+    font-size: 2.4rem;
+    margin-bottom: 6px;
+    display: block;
+    animation: rate-limit-pulse 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 8px rgba(255, 180, 60, 0.7));
+}
+
+@keyframes rate-limit-pulse {
+    0%, 100% { transform: scale(1);   opacity: 1;    }
+    50%       { transform: scale(1.1); opacity: 0.82; }
+}
+
+.rate-limit-eyebrow {
+    color: #ffb43c !important;
+    letter-spacing: 0.12em;
+}
+
+.rate-limit-detail {
+    color: rgba(241, 243, 247, 0.75);
+    line-height: 1.65;
+    font-size: 0.95rem;
+}
+
+.rate-limit-ok-button {
+    background: linear-gradient(135deg, #e8971a 0%, #ffb43c 100%) !important;
+    color: #0f1117 !important;
+    font-weight: 600;
+    min-width: 120px;
+    box-shadow: 0 4px 18px rgba(255, 180, 60, 0.35);
+    transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.rate-limit-ok-button:hover {
+    opacity: 1 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 24px rgba(255, 180, 60, 0.5);
+}
+
+.rate-limit-ok-button:active {
+    transform: translateY(0);
+}

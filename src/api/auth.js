@@ -1,3 +1,5 @@
+import { RateLimitError } from "./errors";
+
 const API = import.meta.env.VITE_API_URL.replace(/\/$/, "")
 
 async function readResponse(res) {
@@ -22,6 +24,11 @@ export async function login(username, password) {
         }),
     })
 
+    if (res.status === 429) {
+        const data = await res.json().catch(() => ({}));
+        throw new RateLimitError(data.detail || "Too many login attempts. Please wait before trying again.");
+    }
+
     const data = await readResponse(res)
 
     if (!res.ok) {
@@ -42,6 +49,11 @@ export async function register(username, password) {
             password,
         }),
     })
+
+    if (res.status === 429) {
+        const data = await res.json().catch(() => ({}));
+        throw new RateLimitError(data.detail || "Too many registration attempts. Please wait before trying again.");
+    }
 
     const data = await readResponse(res)
 

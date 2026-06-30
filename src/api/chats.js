@@ -1,9 +1,16 @@
+import { RateLimitError } from "./errors";
+
 const API = import.meta.env.VITE_API_URL.replace(/\/$/, "")
 
 export async function getChats(username) {
     const res = await fetch(
         `${API}/get-chats?username=${encodeURIComponent(username)}`
     )
+
+    if (res.status === 429) {
+        const data = await res.json().catch(() => ({}));
+        throw new RateLimitError(data.detail || "Too many requests. Please wait and try again.");
+    }
 
     const data = await res.json()
 
@@ -26,6 +33,11 @@ export async function createChat(username, title) {
         }),
     })
 
+    if (res.status === 429) {
+        const data = await res.json().catch(() => ({}));
+        throw new RateLimitError(data.detail || "Too many requests. Please wait and try again.");
+    }
+
     const text = await res.text()
 
     if (!res.ok) {
@@ -46,6 +58,11 @@ export async function deleteChat(username, title) {
             title,
         }),
     })
+
+    if (res.status === 429) {
+        const data = await res.json().catch(() => ({}));
+        throw new RateLimitError(data.detail || "Too many requests. Please wait and try again.");
+    }
 
     const text = await res.text()
 

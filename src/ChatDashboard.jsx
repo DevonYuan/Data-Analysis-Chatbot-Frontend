@@ -9,6 +9,8 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import NewChatModal from "./NewChatModal";
 import ConfirmModal from "./ConfirmModal"
+import RateLimitModal from "./RateLimitModal"
+import { RateLimitError } from "./api/errors"
 import "./styles/globals.css";
 import "./styles/effects.css";
 import "./styles/layout.css";
@@ -51,6 +53,7 @@ export default function ChatDashboard() {
     const [isDeletingChat, setIsDeletingChat] = useState(false);
     const [shouldSendOnCreate, setShouldSendOnCreate] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
+    const [rateLimitError, setRateLimitError] = useState(null);
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
 
@@ -95,7 +98,11 @@ export default function ChatDashboard() {
             }
             setShouldSendOnCreate(false);
         } catch (error) {
-            console.error("Failed to create chat:", error);
+            if (error instanceof RateLimitError) {
+                setRateLimitError(error.message);
+            } else {
+                console.error("Failed to create chat:", error);
+            }
         } finally {
             setIsCreatingChat(false);
         }
@@ -121,7 +128,11 @@ export default function ChatDashboard() {
 
             setChatToDelete(null)
         } catch (error) {
-            console.error("Failed to delete chat:", error)
+            if (error instanceof RateLimitError) {
+                setRateLimitError(error.message);
+            } else {
+                console.error("Failed to delete chat:", error);
+            }
         } finally {
             setIsDeletingChat(false)
         }
@@ -142,10 +153,19 @@ export default function ChatDashboard() {
         // Add user message to UI
         setMessages((prev) => [...prev, { sender: "user", text: input }]);
 
-        const reply = await sendMessage(username, title, input);
-
-        // Add AI message to UI
-        setMessages((prev) => [...prev, { sender: "ai", text: reply }]);
+        try {
+            const reply = await sendMessage(username, title, input);
+            // Add AI message to UI
+            setMessages((prev) => [...prev, { sender: "ai", text: reply }]);
+        } catch (error) {
+            // Remove the optimistically-added user message on rate limit
+            if (error instanceof RateLimitError) {
+                setMessages((prev) => prev.slice(0, -1));
+                setRateLimitError(error.message);
+            } else {
+                console.error("Failed to send message:", error);
+            }
+        }
 
         setInput("");
     }
@@ -168,8 +188,12 @@ export default function ChatDashboard() {
             setMessages((prev) => [...prev, { sender: "user", text: `Uploaded file: ${file.filename}` }]);
             setMessages((prev) => [...prev, { sender: "ai", text: `File uploaded successfully to bucket storage. You can now ask questions about your data.` }]);
         } catch (error) {
-            console.error("Failed to upload file:", error);
-            alert(`Failed to upload file: ${error.message}`);
+            if (error instanceof RateLimitError) {
+                setRateLimitError(error.message);
+            } else {
+                console.error("Failed to upload file:", error);
+                alert(`Failed to upload file: ${error.message}`);
+            }
         } finally {
             setIsUploading(false);
             fileInputRef.current.value = "";
@@ -184,8 +208,12 @@ export default function ChatDashboard() {
                 const list = await getChats(username);
                 setChats(Array.isArray(list) ? list : []);
             } catch (error) {
-                console.error("Failed to load chats:", error);
-                setChats([]);
+                if (error instanceof RateLimitError) {
+                    setRateLimitError(error.message);
+                } else {
+                    console.error("Failed to load chats:", error);
+                    setChats([]);
+                }
             }
         }
 
@@ -205,8 +233,12 @@ export default function ChatDashboard() {
                 const list = await getMessages(username, currentChat);
                 setMessages(Array.isArray(list) ? list : []);
             } catch (error) {
-                console.error("Failed to load messages:", error);
-                setMessages([]);
+                if (error instanceof RateLimitError) {
+                    setRateLimitError(error.message);
+                } else {
+                    console.error("Failed to load messages:", error);
+                    setMessages([]);
+                }
             }
         }
 
@@ -221,6 +253,12 @@ export default function ChatDashboard() {
                 onCreate={handleCreateChat}
                 isCreating={isCreatingChat}
                 existingTitles={chats}
+            />
+
+            <RateLimitModal
+                isOpen={Boolean(rateLimitError)}
+                message={rateLimitError}
+                onClose={() => setRateLimitError(null)}
             />
 
             <ConfirmModal

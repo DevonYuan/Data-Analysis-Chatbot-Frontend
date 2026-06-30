@@ -1,3 +1,5 @@
+import { RateLimitError } from "./errors";
+
 const API = import.meta.env.VITE_API_URL.replace(/\/$/, "")
 
 export async function uploadFile(username, chatTitle, file) {
@@ -11,6 +13,11 @@ export async function uploadFile(username, chatTitle, file) {
         body: formData,
     })
 
+    if (res.status === 429) {
+        const data = await res.json().catch(() => ({}));
+        throw new RateLimitError(data.detail || "Too many uploads. Please wait and try again.");
+    }
+
     const text = await res.text()
 
     if (!res.ok) {
@@ -19,3 +26,4 @@ export async function uploadFile(username, chatTitle, file) {
 
     return text
 }
+
