@@ -1,7 +1,7 @@
 services:
   - type: web
     name: frontend
-    env: static
+    runtime: static
     buildCommand: npm run build
     staticPublishPath: ./dist
     routes:
