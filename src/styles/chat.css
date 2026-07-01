@@ -142,9 +142,9 @@
     align-items: center;
     justify-content: center;
 
-    background: rgba(5, 6, 12, 0.58);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: rgba(5, 6, 12, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
 
     animation: modal-fade-in 0.22s ease forwards;
 }
