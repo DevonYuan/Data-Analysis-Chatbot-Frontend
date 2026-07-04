@@ -38,12 +38,8 @@ export default function SignupPage() {
                 return
             }
 
-            if (message === "User created!" || message === "Registered successfully!" || message === "Username is now registered!") {
-                showToast("Account created. Redirecting...", "success")
-
-                setTimeout(() => {
-                    navigate("/chat", { replace: true })
-                }, 700)
+            if (message === "User created!" || message === "Registered successfully!" || message === "Username is now registered!" || message.includes("verify your email")) {
+                showToast("Account created! Please check your email to verify.", "success")
 
                 return
             }

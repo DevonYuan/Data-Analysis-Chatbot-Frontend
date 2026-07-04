@@ -179,3 +179,12 @@
 .signup-text a:hover {
     opacity: 0.85;
 }
+
+.verify-link {
+    color: #8ab4ff;
+    text-decoration: none;
+}
+
+.verify-link:hover {
+    opacity: 0.85;
+}

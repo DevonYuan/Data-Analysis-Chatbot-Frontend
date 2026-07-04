@@ -30,6 +30,11 @@ export default function LoginPage() {
                 return
             }
 
+            if (message === "Please verify your email before logging in.") {
+                showToast("Please verify your email before logging in.", "error")
+                return
+            }
+
             showToast(message, "error")
         } catch (error) {
             console.error("Login failed:", error)

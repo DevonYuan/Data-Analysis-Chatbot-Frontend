@@ -3,6 +3,7 @@ import HomePage from "./HomePage"
 import LoginPage from "./LoginPage"
 import SignupPage from "./SignUpPage"
 import ChatDashboard from "./ChatDashboard"
+import VerifyEmailPage from "./VerifyEmailPage"
 
 import "./styles/auth.css"
 import "./styles/chat.css"
@@ -28,6 +29,7 @@ export default function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
+            <Route path="/verify-email" element={<VerifyEmailPage />} />
 
             <Route
                 path="/chat"

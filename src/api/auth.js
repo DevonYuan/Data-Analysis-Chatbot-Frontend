@@ -101,3 +101,40 @@ export async function logout() {
 
     return data
 }
+
+export async function verifyEmail(token) {
+    const res = await fetch(`${API}/verify-email?token=${encodeURIComponent(token)}`, {
+        method: "GET",
+    })
+
+    const data = await readResponse(res)
+
+    if (!res.ok) {
+        throw new Error(typeof data === "string" ? data : JSON.stringify(data))
+    }
+
+    return data
+}
+
+export async function resendVerification(username) {
+    const res = await fetch(`${API}/resend-verification`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({ username }),
+    })
+
+    if (res.status === 429) {
+        const data = await res.json().catch(() => ({}));
+        throw new RateLimitError(data.detail || "Too many requests. Please wait and try again.");
+    }
+
+    const data = await readResponse(res)
+
+    if (!res.ok) {
+        throw new Error(typeof data === "string" ? data : JSON.stringify(data))
+    }
+
+    return data
+}
