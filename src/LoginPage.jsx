@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import { login } from "./api/auth"
+import { login, resendVerification } from "./api/auth"
 import StatusToast from "./StatusToast"
 import "./styles/effects.css"
 import "./styles/layout.css"
@@ -12,6 +12,8 @@ export default function LoginPage() {
     const [password, setPassword] = useState("")
     const [toast, setToast] = useState(null)
     const [isLoading, setIsLoading] = useState(false)
+    const [showResend, setShowResend] = useState(false)
+    const [isResending, setIsResending] = useState(false)
     const navigate = useNavigate()
 
     async function handleSubmit(event) {
@@ -32,6 +34,7 @@ export default function LoginPage() {
 
             if (message === "Please verify your email before logging in.") {
                 showToast("Please verify your email before logging in.", "error")
+                setShowResend(true)
                 return
             }
 
@@ -50,6 +53,25 @@ export default function LoginPage() {
         setTimeout(() => {
             setToast(null)
         }, 2800)
+    }
+
+    async function handleResend(event) {
+        event.preventDefault()
+        if (!email) {
+            showToast("Please enter your email address first.", "error")
+            return
+        }
+
+        try {
+            setIsResending(true)
+            await resendVerification(email)
+            showToast("Verification email sent! Please check your inbox.", "success")
+            setShowResend(false)
+        } catch (error) {
+            showToast(error.message, "error")
+        } finally {
+            setIsResending(false)
+        }
     }
 
     return (
@@ -116,6 +138,26 @@ export default function LoginPage() {
                         Don&apos;t have an account?{" "}
                         <Link to="/signup">Create one</Link>
                     </p>
+
+                    {showResend && (
+                        <form className="signup-text" onSubmit={handleResend} style={{ marginTop: 16 }}>
+                            <button
+                                type="submit"
+                                disabled={isResending}
+                                style={{
+                                    background: "none",
+                                    border: "none",
+                                    color: "#8ab4ff",
+                                    cursor: "pointer",
+                                    fontFamily: "inherit",
+                                    fontSize: "0.82rem",
+                                    textDecoration: "underline",
+                                }}
+                            >
+                                {isResending ? "Sending..." : "Resend verification email"}
+                            </button>
+                        </form>
+                    )}
                 </form>
             </div>
         </div>
