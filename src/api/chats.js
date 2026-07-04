@@ -1,10 +1,14 @@
 import { RateLimitError } from "./errors";
+import { postForm } from "./apiClient";
 
-const API = import.meta.env.VITE_API_URL.replace(/\/$/, "")
-
-export async function getChats(username) {
+export async function getChats() {
     const res = await fetch(
-        `${API}/get-chats?username=${encodeURIComponent(username)}`
+        `${import.meta.env.VITE_API_URL.replace(/\/$/, "")}/get-chats`,
+        {
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem("access_token")}`,
+            },
+        }
     )
 
     if (res.status === 429) {
@@ -22,53 +26,9 @@ export async function getChats(username) {
 }
 
 export async function createChat(username, title) {
-    const res = await fetch(`${API}/create-chat`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: new URLSearchParams({
-            username,
-            title,
-        }),
-    })
-
-    if (res.status === 429) {
-        const data = await res.json().catch(() => ({}));
-        throw new RateLimitError(data.detail || "Too many requests. Please wait and try again.");
-    }
-
-    const text = await res.text()
-
-    if (!res.ok) {
-        throw new Error(text)
-    }
-
-    return text
+    return postForm("/create-chat", { username, title })
 }
 
 export async function deleteChat(username, title) {
-    const res = await fetch(`${API}/delete-chat`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: new URLSearchParams({
-            username,
-            title,
-        }),
-    })
-
-    if (res.status === 429) {
-        const data = await res.json().catch(() => ({}));
-        throw new RateLimitError(data.detail || "Too many requests. Please wait and try again.");
-    }
-
-    const text = await res.text()
-
-    if (!res.ok) {
-        throw new Error(text)
-    }
-
-    return text
+    return postForm("/delete-chat", { username, title })
 }

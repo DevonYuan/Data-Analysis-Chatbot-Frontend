@@ -35,6 +35,12 @@ export async function login(username, password) {
         throw new Error(typeof data === "string" ? data : JSON.stringify(data))
     }
 
+    // Store JWT token and username
+    if (data.access_token) {
+        localStorage.setItem("access_token", data.access_token)
+        localStorage.setItem("username", username)
+    }
+
     return data
 }
 
@@ -60,6 +66,38 @@ export async function register(username, password) {
     if (!res.ok) {
         throw new Error(typeof data === "string" ? data : JSON.stringify(data))
     }
+
+    // Store JWT token and username
+    if (data.access_token) {
+        localStorage.setItem("access_token", data.access_token)
+        localStorage.setItem("username", username)
+    }
+
+    return data
+}
+
+export async function logout() {
+    const res = await fetch(`${API}/logout`, {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("access_token")}`,
+        },
+    })
+
+    if (res.status === 429) {
+        const data = await res.json().catch(() => ({}));
+        throw new RateLimitError(data.detail || "Too many requests. Please wait and try again.");
+    }
+
+    const data = await readResponse(res)
+
+    if (!res.ok) {
+        throw new Error(typeof data === "string" ? data : JSON.stringify(data))
+    }
+
+    // Clear tokens from localStorage
+    localStorage.removeItem("access_token")
+    localStorage.removeItem("username")
 
     return data
 }

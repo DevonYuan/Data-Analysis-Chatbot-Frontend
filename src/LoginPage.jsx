@@ -21,12 +21,11 @@ export default function LoginPage() {
             setIsLoading(true)
 
             const result = await login(email, password)
-            const message = String(result).trim()
+            const message = String(result.message || result).trim()
 
             console.log("Login result:", message)
 
             if (message === "Logged in!") {
-                localStorage.setItem("username", email)
                 navigate("/chat", { replace: true })
                 return
             }

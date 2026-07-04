@@ -29,7 +29,7 @@ export default function SignupPage() {
             setIsLoading(true)
 
             const result = await register(email, password)
-            const message = String(result).trim()
+            const message = String(result.message || result).trim()
 
             console.log("Signup result:", message)
 
@@ -39,7 +39,6 @@ export default function SignupPage() {
             }
 
             if (message === "User created!" || message === "Registered successfully!" || message === "Username is now registered!") {
-                localStorage.setItem("username", email)
                 showToast("Account created. Redirecting...", "success")
 
                 setTimeout(() => {

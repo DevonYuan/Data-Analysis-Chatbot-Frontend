@@ -13,9 +13,9 @@ import "./styles/layout.css"
 import "./styles/sidebar.css"
 
 function RequireAuth({ children }) {
-    const username = localStorage.getItem("username")
+    const token = localStorage.getItem("access_token")
 
-    if (!username) {
+    if (!token) {
         return <Navigate to="/login" replace />
     }
 

@@ -4,6 +4,7 @@ import { OrbitControls } from "@react-three/drei";
 import { getChats, createChat, deleteChat } from "./api/chats";
 import { sendMessage, getMessages } from "./api/messages";
 import { uploadFile } from "./api/upload";
+import { logout } from "./api/auth";
 import { useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -74,14 +75,12 @@ export default function ChatDashboard() {
     }, [messages]);
 
     async function handleCreateChat(title) {
-        const username = localStorage.getItem("username");
-
         try {
             setIsCreatingChat(true);
 
-            await createChat(username, title);
+            await createChat(title);
 
-            const updated = await getChats(username);
+            const updated = await getChats();
             setChats(updated);
 
             setCurrentChat(title);
@@ -90,7 +89,7 @@ export default function ChatDashboard() {
 
             if (shouldSendOnCreate && input.trim()) {
                 setMessages([{ sender: "user", text: input }]);
-                const reply = await sendMessage(username, title, input);
+                const reply = await sendMessage(title, input);
                 setMessages((prev) => [...prev, { sender: "ai", text: reply }]);
                 setInput("");
             } else {
@@ -111,14 +110,12 @@ export default function ChatDashboard() {
     async function handleDeleteChat() {
         if (!chatToDelete) return
 
-        const username = localStorage.getItem("username")
-
         try {
             setIsDeletingChat(true)
 
-            await deleteChat(username, chatToDelete)
+            await deleteChat(chatToDelete)
 
-            const updated = await getChats(username)
+            const updated = await getChats()
             setChats(updated)
 
             if (currentChat === chatToDelete) {
@@ -139,7 +136,6 @@ export default function ChatDashboard() {
     }
 
     async function handleSend() {
-        const username = localStorage.getItem("username");
         const title = currentChat;
 
         if (!currentChat) {
@@ -154,7 +150,7 @@ export default function ChatDashboard() {
         setMessages((prev) => [...prev, { sender: "user", text: input }]);
 
         try {
-            const reply = await sendMessage(username, title, input);
+            const reply = await sendMessage(title, input);
             // Add AI message to UI
             setMessages((prev) => [...prev, { sender: "ai", text: reply }]);
         } catch (error) {
@@ -174,8 +170,6 @@ export default function ChatDashboard() {
         const file = event.target.files[0];
         if (!file) return;
 
-        const username = localStorage.getItem("username");
-
         if (!currentChat) {
             alert("Please create or select a chat first before uploading a file.");
             fileInputRef.current.value = "";
@@ -184,7 +178,7 @@ export default function ChatDashboard() {
 
         try {
             setIsUploading(true);
-            const result = await uploadFile(username, currentChat, file);
+            const result = await uploadFile(currentChat, file);
             setMessages((prev) => [...prev, { sender: "user", text: `Uploaded file: ${file.filename}` }]);
             setMessages((prev) => [...prev, { sender: "ai", text: `File uploaded successfully to bucket storage. You can now ask questions about your data.` }]);
         } catch (error) {
@@ -201,11 +195,9 @@ export default function ChatDashboard() {
     }
 
     useEffect(() => {
-        const username = localStorage.getItem("username");
-
         async function loadChats() {
             try {
-                const list = await getChats(username);
+                const list = await getChats();
                 setChats(Array.isArray(list) ? list : []);
             } catch (error) {
                 if (error instanceof RateLimitError) {
@@ -226,11 +218,9 @@ export default function ChatDashboard() {
             return;
         }
 
-        const username = localStorage.getItem("username");
-
         async function loadMessages() {
             try {
-                const list = await getMessages(username, currentChat);
+                const list = await getMessages(currentChat);
                 setMessages(Array.isArray(list) ? list : []);
             } catch (error) {
                 if (error instanceof RateLimitError) {
@@ -281,9 +271,14 @@ export default function ChatDashboard() {
 
                 <button
                     className="sidebar-back-button"
-                    onClick={() => {
-                        localStorage.removeItem("username");
-                        navigate("/login");
+                    onClick={async () => {
+                        try {
+                            await logout()
+                        } catch (error) {
+                            console.error("Logout failed:", error)
+                        } finally {
+                            navigate("/login")
+                        }
                     }}
                 >
                     Log out
