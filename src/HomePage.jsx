@@ -1,7 +1,7 @@
 import { Canvas, useFrame } from "@react-three/fiber"
-import { OrbitControls, Sphere } from "@react-three/drei"
+import { OrbitControls } from "@react-three/drei"
 import { Link } from "react-router"
-import { useRef, useState, useEffect, useMemo } from "react"
+import { useRef, useState, useEffect } from "react"
 import * as THREE from "three"
 
 import "./styles/globals.css"
@@ -12,7 +12,6 @@ import "./styles/landing.css"
 
 const ACCENT = "#c0442b"
 const WIREFRAME_COLOR = "#c0442b"
-const NODE_COLOR = "#e05535"
 
 // Reduced-motion check
 function usePrefersReducedMotion() {
@@ -30,64 +29,14 @@ function usePrefersReducedMotion() {
     return reduced
 }
 
-// Generate evenly distributed points on sphere surface
-function useSpherePoints(count, radius) {
-    return useMemo(() => {
-        const pts = []
-        const goldenAngle = Math.PI * (3 - Math.sqrt(5))
-        for (let i = 0; i < count; i++) {
-            const y = 1 - (i / (count - 1)) * 2
-            const r = Math.sqrt(1 - y * y)
-            const theta = goldenAngle * i
-            pts.push(new THREE.Vector3(
-                Math.cos(theta) * r * radius,
-                y * radius,
-                Math.sin(theta) * r * radius
-            ))
-        }
-        return pts
-    }, [count, radius])
-}
-
 function GlobeScene({ mouseX, mouseY }) {
     const reduced = usePrefersReducedMotion()
     const groupRef = useRef()
-    const nodeRefs = useRef([])
-    const connectionRefs = useRef([])
-    const clock = useRef(0)
 
     const RADIUS = 1.9
-    const nodeCount = 28
-    const nodePositions = useSpherePoints(nodeCount, RADIUS)
-
-    // Build a few connection line geometries between nearby nodes
-    const connectionPairs = useMemo(() => {
-        const pairs = []
-        for (let i = 0; i < nodePositions.length; i++) {
-            for (let j = i + 1; j < nodePositions.length; j++) {
-                if (nodePositions[i].distanceTo(nodePositions[j]) < 1.6) {
-                    pairs.push([i, j])
-                }
-            }
-        }
-        return pairs.slice(0, 18) // limit to 18 connections
-    }, [nodePositions])
-
-    const connectionGeometries = useMemo(() =>
-        connectionPairs.map(([a, b]) => {
-            const geo = new THREE.BufferGeometry().setFromPoints([
-                nodePositions[a],
-                nodePositions[b],
-            ])
-            return geo
-        }),
-        [connectionPairs, nodePositions]
-    )
 
     useFrame((_, delta) => {
         if (reduced || !groupRef.current) return
-
-        clock.current += delta
 
         // Slow continuous rotation
         groupRef.current.rotation.y += delta * 0.22
@@ -103,27 +52,10 @@ function GlobeScene({ mouseX, mouseY }) {
             -mouseX * 0.1,
             0.04
         )
-
-        // Pulsing nodes
-        nodeRefs.current.forEach((mesh, i) => {
-            if (!mesh) return
-            const phase = (clock.current * 1.1 + i * 0.45) % (Math.PI * 2)
-            const pulse = 0.8 + Math.sin(phase) * 0.35
-            mesh.scale.setScalar(pulse)
-            mesh.material.opacity = 0.5 + Math.sin(phase) * 0.4
-        })
-
-        // Animate connection lines opacity in sequence
-        connectionRefs.current.forEach((line, i) => {
-            if (!line) return
-            const phase = (clock.current * 0.7 + i * 0.6) % (Math.PI * 2)
-            line.material.opacity = 0.15 + Math.sin(phase) * 0.12
-        })
     })
 
     return (
         <group ref={groupRef}>
-            {/* Wireframe icosahedron globe */}
             <mesh>
                 <icosahedronGeometry args={[RADIUS, 3]} />
                 <meshBasicMaterial
@@ -133,34 +65,6 @@ function GlobeScene({ mouseX, mouseY }) {
                     opacity={0.22}
                 />
             </mesh>
-
-            {/* Data node points */}
-            {nodePositions.map((pos, i) => (
-                <mesh
-                    key={i}
-                    position={pos}
-                    ref={(el) => { nodeRefs.current[i] = el }}
-                >
-                    <sphereGeometry args={[0.045, 8, 8]} />
-                    <meshBasicMaterial
-                        color={NODE_COLOR}
-                        transparent
-                        opacity={0.7}
-                    />
-                </mesh>
-            ))}
-
-            {/* Connection lines between nearby nodes */}
-            {connectionGeometries.map((geo, i) => (
-                <line key={i} ref={(el) => { connectionRefs.current[i] = el }}>
-                    <primitive object={geo} attach="geometry" />
-                    <lineBasicMaterial
-                        color={ACCENT}
-                        transparent
-                        opacity={0.2}
-                    />
-                </line>
-            ))}
         </group>
     )
 }
@@ -178,10 +82,15 @@ export default function HomePage() {
 
     return (
         <div className="landing-container" onMouseMove={handleMouseMove}>
+            {/* Grain texture overlay */}
+            <div className="landing-grain" aria-hidden="true" />
+
             <div className="content-wrapper">
 
                 {/* LEFT: 3D Scene */}
                 <div className="canvas-wrapper">
+                    {/* Dot-pattern background with radial fade */}
+                    <div className="canvas-dot-bg" aria-hidden="true" />
                     <Canvas camera={{ position: [2.5, 0, 5], fov: 48 }}>
                         <ambientLight intensity={0.6} />
                         <directionalLight position={[5, 5, 5]} intensity={0.8} />
@@ -199,6 +108,26 @@ export default function HomePage() {
                             Upload a CSV, ask questions in plain English, and generate
                             insights using the Pandas library — no code required.
                         </p>
+
+                        {/* Mini sparkline accent — ties visual to data theme */}
+                        <div className="hero-sparkline" aria-hidden="true">
+                            <svg width="180" height="42" viewBox="0 0 180 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                {/* Bar chart */}
+                                {[8,18,12,28,16,36,22,32,14,26,38,20,30,10,34].map((h, i) => (
+                                    <rect
+                                        key={i}
+                                        x={i * 12 + 1}
+                                        y={42 - h}
+                                        width={8}
+                                        height={h}
+                                        rx={2}
+                                        fill={i === 10 ? "var(--color-accent)" : "var(--color-border-strong)"}
+                                        opacity={i === 10 ? 1 : 0.7}
+                                    />
+                                ))}
+                            </svg>
+                            <span className="hero-sparkline-label">rows analyzed</span>
+                        </div>
 
                         <div className="button-row">
                             <Link

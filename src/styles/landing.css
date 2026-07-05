@@ -28,11 +28,14 @@
     align-items: center;
     justify-content: center;
     position: relative;
+    overflow: hidden;
 }
 
 .canvas-wrapper canvas {
     width: 100% !important;
     height: 100% !important;
+    position: relative;
+    z-index: 1;
 }
 
 /* Right side container */
@@ -114,4 +117,59 @@
     background: var(--color-accent);
     border-radius: 2px;
     margin-bottom: 28px;
+}
+
+/* -------------------------
+   GRAIN TEXTURE OVERLAY
+   Cheap noise that kills AI-flatness
+------------------------- */
+.landing-grain {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0.028;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 200px 200px;
+}
+
+/* -------------------------
+   DOT-PATTERN BACKGROUND (canvas side)
+   Radial fade at edges
+------------------------- */
+.canvas-dot-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image: radial-gradient(circle, var(--color-border) 1px, transparent 1px);
+    background-size: 28px 28px;
+    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 30%, transparent 100%);
+    mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 30%, transparent 100%);
+    opacity: 0.55;
+}
+
+/* -------------------------
+   MINI SPARKLINE ACCENT
+------------------------- */
+.hero-sparkline {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    margin: 28px 0 4px;
+}
+
+.hero-sparkline svg {
+    display: block;
+    flex-shrink: 0;
+}
+
+.hero-sparkline-label {
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--color-ink-3);
+    letter-spacing: 0.03em;
+    padding-bottom: 4px;
 }
