@@ -179,7 +179,7 @@ export default function ChatDashboard() {
         try {
             setIsUploading(true);
             const result = await uploadFile(currentChat, file);
-            setMessages((prev) => [...prev, { sender: "user", text: `Uploaded file: ${file.filename}` }]);
+            setMessages((prev) => [...prev, { sender: "user", text: `Uploaded file: ${file.name}` }]);
             setMessages((prev) => [...prev, { sender: "ai", text: `File uploaded successfully to bucket storage. You can now ask questions about your data.` }]);
         } catch (error) {
             if (error instanceof RateLimitError) {

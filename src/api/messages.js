@@ -3,7 +3,8 @@ import { postForm, get } from "./apiClient";
 
 const API = import.meta.env.VITE_API_URL.replace(/\/$/, "")
 
-export async function sendMessage(username, title, message) {
+export async function sendMessage(title, message) {
+    const username = localStorage.getItem("username")
     return postForm("/send-message", { username, title, message, sender: "user" })
 }
 

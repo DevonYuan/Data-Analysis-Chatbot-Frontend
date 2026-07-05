@@ -25,10 +25,12 @@ export async function getChats() {
     return data
 }
 
-export async function createChat(username, title) {
+export async function createChat(title) {
+    const username = localStorage.getItem("username")
     return postForm("/create-chat", { username, title })
 }
 
-export async function deleteChat(username, title) {
+export async function deleteChat(title) {
+    const username = localStorage.getItem("username")
     return postForm("/delete-chat", { username, title })
 }
