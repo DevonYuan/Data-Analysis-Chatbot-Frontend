@@ -1,6 +1,6 @@
 import { Canvas, useFrame } from "@react-three/fiber"
 import { OrbitControls } from "@react-three/drei"
-import { Link } from "react-router"
+import { Link } from "react-router-dom"
 import { useRef, useState, useEffect } from "react"
 import * as THREE from "three"
 
