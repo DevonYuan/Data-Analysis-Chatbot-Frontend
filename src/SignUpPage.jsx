@@ -71,8 +71,6 @@ export default function SignupPage() {
 
             <div className="login-layout">
                 <div className="login-copy">
-                    <p className="eyebrow">GET STARTED</p>
-
                     <h1 className="login-heading">
                         Build your personal data workspace.
                     </h1>
@@ -90,8 +88,6 @@ export default function SignupPage() {
                 </div>
 
                 <form className="login-card signup-card" onSubmit={handleSubmit}>
-                    <p className="eyebrow">DATA ANALYSIS CHATBOT</p>
-
                     <h2 className="login-card-title">Create account</h2>
 
                     <label className="input-label">

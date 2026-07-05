@@ -1,6 +1,6 @@
 import { RateLimitError } from "./errors";
 
-const API = import.meta.env.VITE_API_URL.replace(/\/$/, "")
+const API = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "")
 
 async function readResponse(res) {
     const contentType = res.headers.get("content-type")
