@@ -348,7 +348,7 @@ export default function ChatDashboard() {
                                 { icon: "↗", text: "Summarize the key statistics of my dataset" },
                                 { icon: "⬡", text: "Find and explain any outliers in the data" },
                                 { icon: "≋", text: "Which columns have missing values, and how many?" },
-                                { icon: "◎", text: "Plot the distribution of values in a column" },
+                                { icon: "◎", text: "Calculate the distribution of values in a column" },
                             ].map(({ icon, text }) => (
                                 <button
                                     key={text}
