@@ -7,29 +7,49 @@
 ------------------------- */
 
 .button {
-    padding: 12px 18px;
-    font-family: inherit;
+    padding: 11px 20px;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 500;
     cursor: pointer;
-    border-radius: 999px;
     border: none;
-    transition: 0.25s ease;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.18s ease, box-shadow 0.18s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
 }
 
-.button-glass {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    color: #f1f3f7;
-}
-
+/* Primary: visually heavy, filled terracotta */
 .button-primary {
-    background: #8ab4ff;
-    color: #0f1117;
+    background: var(--color-accent);
+    color: #fff;
+    border-radius: var(--radius-md);
+    box-shadow: 0 1px 3px rgba(192, 68, 43, 0.25), 0 4px 14px rgba(192, 68, 43, 0.18);
 }
 
-.button:hover {
-    opacity: 0.85;
+.button-primary:hover {
+    background: var(--color-accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(192, 68, 43, 0.3), 0 6px 20px rgba(192, 68, 43, 0.22);
+}
+
+.button-primary:active {
+    transform: translateY(0);
+}
+
+/* Ghost: lighter, outlined */
+.button-glass {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-strong);
+    color: var(--color-ink);
+    border-radius: var(--radius-md);
+}
+
+.button-glass:hover {
+    background: var(--color-surface-alt);
+    border-color: var(--color-ink-3);
+    transform: translateY(-1px);
 }
 
 /* -------------------------
@@ -37,84 +57,78 @@
 ------------------------- */
 
 .input {
-    height: 48px;
-    padding: 0 16px;
-    border-radius: 14px;
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    background: rgba(255, 255, 255, 0.08);
-    color: #f1f3f7;
-    font-family: inherit;
+    height: 44px;
+    padding: 0 14px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border-strong);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
     outline: none;
-    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .input::placeholder {
-    color: rgba(241, 243, 247, 0.35);
+    color: var(--color-ink-3);
 }
 
 .input:focus {
-    border-color: rgba(138, 180, 255, 0.65);
-    box-shadow: 0 0 0 4px rgba(138, 180, 255, 0.12);
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-muted);
 }
 
 /* -------------------------
-   GLASS CARDS
+   CARDS
 ------------------------- */
 
 .card-glass {
-    background: rgba(255, 255, 255, 0.075);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: 28px;
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-    box-shadow:
-        0 18px 50px rgba(0, 0, 0, 0.28),
-        inset 0 1px 0 rgba(255, 255, 255, 0.08);
-    padding: 42px;
-    color: #f1f3f7;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 2px 8px rgba(26, 25, 22, 0.06), 0 12px 40px rgba(26, 25, 22, 0.06);
+    padding: 40px;
+    color: var(--color-ink);
 }
 
 /* -------------------------
-   TITLES + TEXT
+   TYPOGRAPHY
 ------------------------- */
 
 .title-xl {
+    font-family: var(--font-display);
     font-size: 3rem;
+    line-height: 1.1;
     margin: 0 0 20px;
-    letter-spacing: 1px;
+    color: var(--color-ink);
 }
 
 .title-lg {
+    font-family: var(--font-display);
     font-size: 2.2rem;
-    margin-bottom: 26px;
+    line-height: 1.15;
+    margin-bottom: 24px;
+    color: var(--color-ink);
 }
 
 .subtitle {
+    font-family: var(--font-body);
     font-size: 1rem;
-    line-height: 1.7;
-    color: rgba(241, 243, 247, 0.72);
+    line-height: 1.65;
+    color: var(--color-ink-2);
 }
 
 /* -------------------------
-   HOVER EFFECTS
+   HOVER MICRO-INTERACTIONS
 ------------------------- */
 
 .hover-lift {
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .hover-lift:hover {
     transform: translateY(-2px);
-    box-shadow: 0 0 14px rgba(138, 180, 255, 0.45);
-}
-
-.hover-slide {
-    transition: transform 0.25s ease, background 0.25s ease;
-}
-
-.hover-slide:hover {
-    transform: translateX(4px);
-    background: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 6px 20px rgba(26, 25, 22, 0.1);
 }
 
 /* -------------------------
@@ -123,38 +137,36 @@
 
 .status-toast {
     position: fixed;
-    top: 32px;
+    top: 28px;
     left: 50%;
     transform: translateX(-50%);
-    padding: 14px 24px;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: 999px;
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-    color: #f1f3f7;
-    font-size: 0.9rem;
+    padding: 12px 22px;
+    background: var(--color-ink);
+    border-radius: var(--radius-pill);
+    color: #fff;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
     display: flex;
     align-items: center;
     gap: 10px;
     z-index: 1000;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 20px rgba(26, 25, 22, 0.2);
 }
 
 .status-toast-dot {
-    width: 8px;
-    height: 8px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
-    background: #8ab4ff;
+    background: var(--color-accent);
+    flex-shrink: 0;
 }
 
 .status-toast-error {
-    border-color: rgba(255, 107, 107, 0.4);
-    background: rgba(255, 107, 107, 0.1);
+    background: var(--color-ink);
 }
 
 .status-toast-error .status-toast-dot {
-    background: #ff6b6b;
+    background: #e05555;
 }
 
 /* -------------------------
@@ -162,53 +174,48 @@
 ------------------------- */
 
 .rate-limit-modal {
-    /* Inherits .new-chat-modal layout but adds an amber tint */
-    border-color: rgba(255, 180, 60, 0.28) !important;
+    border-color: rgba(224, 148, 60, 0.4) !important;
     box-shadow:
-        0 24px 64px rgba(0, 0, 0, 0.45),
-        0 0 0 1px rgba(255, 180, 60, 0.18),
-        inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+        0 20px 60px rgba(26, 25, 22, 0.12),
+        0 0 0 1px rgba(224, 148, 60, 0.2) !important;
 }
 
 .rate-limit-icon {
-    font-size: 2.4rem;
+    font-size: 2.2rem;
     margin-bottom: 6px;
     display: block;
     animation: rate-limit-pulse 2s ease-in-out infinite;
-    filter: drop-shadow(0 0 8px rgba(255, 180, 60, 0.7));
 }
 
 @keyframes rate-limit-pulse {
     0%, 100% { transform: scale(1);   opacity: 1;    }
-    50%       { transform: scale(1.1); opacity: 0.82; }
+    50%       { transform: scale(1.08); opacity: 0.85; }
 }
 
 .rate-limit-eyebrow {
-    color: #ffb43c !important;
-    letter-spacing: 0.12em;
+    color: #c8762a !important;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
 }
 
 .rate-limit-detail {
-    color: rgba(241, 243, 247, 0.75);
+    color: var(--color-ink-2);
     line-height: 1.65;
     font-size: 0.95rem;
 }
 
 .rate-limit-ok-button {
-    background: linear-gradient(135deg, #e8971a 0%, #ffb43c 100%) !important;
-    color: #0f1117 !important;
+    background: #c8762a !important;
+    color: #fff !important;
     font-weight: 600;
     min-width: 120px;
-    box-shadow: 0 4px 18px rgba(255, 180, 60, 0.35);
-    transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: var(--radius-md) !important;
+    box-shadow: 0 2px 10px rgba(200, 118, 42, 0.3);
+    transition: opacity 0.2s ease, transform 0.2s ease !important;
 }
 
 .rate-limit-ok-button:hover {
-    opacity: 1 !important;
-    transform: translateY(-1px);
-    box-shadow: 0 6px 24px rgba(255, 180, 60, 0.5);
-}
-
-.rate-limit-ok-button:active {
-    transform: translateY(0);
+    opacity: 0.9 !important;
+    transform: translateY(-1px) !important;
 }

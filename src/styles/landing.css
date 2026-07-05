@@ -6,11 +6,9 @@
     width: 100vw;
     height: 100vh;
     position: relative;
-    background: #15161d;
+    background: var(--color-bg);
     overflow: hidden;
 }
-
-/* Glow + grid layers will be applied using effects.css utilities */
 
 /* Content wrapper */
 .content-wrapper {
@@ -25,10 +23,11 @@
 .canvas-wrapper {
     flex: 1.35;
     height: 100%;
-    min-width: 620px;
+    min-width: 500px;
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
 }
 
 .canvas-wrapper canvas {
@@ -46,52 +45,57 @@
     padding: 56px;
 }
 
-/* Glass hero card */
+/* Hero card — clean card, no glass blur */
 .glass-card {
     width: 100%;
-    max-width: 560px;
-    padding: 48px;
-    background: rgba(255, 255, 255, 0.075);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: 28px;
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
+    max-width: 520px;
+    padding: 52px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
     box-shadow:
-        0 24px 80px rgba(0, 0, 0, 0.35),
-        inset 0 1px 0 rgba(255, 255, 255, 0.12);
-    color: #f1f3f7;
-    transform: translateX(-110px);
+        0 2px 6px rgba(26, 25, 22, 0.05),
+        0 16px 48px rgba(26, 25, 22, 0.07);
+    color: var(--color-ink);
+    transform: translateX(-80px);
 }
 
-/* Eyebrow text */
+/* Eyebrow — sentence-case, no allcaps */
 .eyebrow {
-    margin: 0 0 18px;
+    margin: 0 0 16px;
+    font-family: var(--font-body);
     font-size: 0.78rem;
-    letter-spacing: 0.18em;
-    color: #8ab4ff;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--color-accent);
+    text-transform: none;
 }
 
 /* Title + subtitle */
 .panel-title {
+    font-family: var(--font-display);
     font-size: 3rem;
-    line-height: 1.08;
-    margin: 0 0 20px;
-    letter-spacing: 1px;
+    line-height: 1.1;
+    margin: 0 0 18px;
+    color: var(--color-ink);
+    letter-spacing: -0.01em;
 }
 
 .panel-subtitle {
+    font-family: var(--font-body);
     font-size: 1rem;
     line-height: 1.7;
     margin: 0;
-    color: rgba(241, 243, 247, 0.72);
-    max-width: 460px;
+    color: var(--color-ink-2);
+    max-width: 420px;
 }
 
 /* Buttons */
 .button-row {
     display: flex;
-    gap: 14px;
-    margin-top: 32px;
+    gap: 12px;
+    margin-top: 36px;
+    align-items: center;
 }
 
 .nav-button {
@@ -99,4 +103,15 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+}
+
+/* Divider rule above card */
+.glass-card::before {
+    content: "";
+    display: block;
+    width: 40px;
+    height: 3px;
+    background: var(--color-accent);
+    border-radius: 2px;
+    margin-bottom: 28px;
 }

@@ -10,7 +10,7 @@ export default function RateLimitModal({ isOpen, message, onClose }) {
 
                 <div className="rate-limit-icon" aria-hidden="true">⏱</div>
 
-                <p className="eyebrow rate-limit-eyebrow">RATE LIMIT</p>
+                <p className="eyebrow rate-limit-eyebrow">Rate limit reached</p>
 
                 <h2 className="modal-title">Slow down a little!</h2>
 

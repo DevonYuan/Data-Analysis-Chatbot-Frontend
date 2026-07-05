@@ -50,8 +50,6 @@ export default function NewChatModal({
                     ×
                 </button>
 
-                <p className="eyebrow">NEW ANALYSIS</p>
-
                 <h2 className="modal-title">Create a new chat</h2>
 
                 <p className="modal-subtitle">

@@ -19,8 +19,6 @@ export default function ConfirmModal({
                     ×
                 </button>
 
-                <p className="eyebrow">{eyebrow}</p>
-
                 <h2 className="modal-title">{title}</h2>
 
                 <p className="modal-subtitle">{message}</p>

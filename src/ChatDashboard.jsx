@@ -33,10 +33,10 @@ function BackgroundSphere() {
         <mesh ref={meshRef} position={[0, 0, -4]}>
             <icosahedronGeometry args={[11, 3]} />
             <meshBasicMaterial
-                color="#8ab4ff"
+                color="#c0442b"
                 wireframe
                 transparent
-                opacity={0.40}
+                opacity={0.25}
             />
         </mesh>
     );
@@ -340,8 +340,30 @@ export default function ChatDashboard() {
                     <div className="chat-welcome-card">
                         <h1 className="chat-welcome-title">Start a new analysis</h1>
                         <p className="chat-welcome-subtitle">
-                            Upload a dataset or ask a question to begin exploring your data.
+                            Upload a CSV and ask a question, or try one of these to get started.
                         </p>
+
+                        <div className="chat-example-prompts">
+                            {[
+                                { icon: "↗", text: "Summarize the key statistics of my dataset" },
+                                { icon: "⬡", text: "Find and explain any outliers in the data" },
+                                { icon: "≋", text: "Which columns have missing values, and how many?" },
+                                { icon: "◎", text: "Plot the distribution of values in a column" },
+                            ].map(({ icon, text }) => (
+                                <button
+                                    key={text}
+                                    className="chat-example-prompt"
+                                    onClick={() => {
+                                        setInput(text);
+                                        setShouldSendOnCreate(true);
+                                        setIsNewChatModalOpen(true);
+                                    }}
+                                >
+                                    <span className="chat-example-prompt-icon">{icon}</span>
+                                    {text}
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 )}
 

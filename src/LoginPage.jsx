@@ -83,8 +83,6 @@ export default function LoginPage() {
 
             <div className="login-layout">
                 <div className="login-copy">
-                    <p className="eyebrow">WELCOME BACK</p>
-
                     <h1 className="login-heading">
                         Turn raw data into answers.
                     </h1>
@@ -102,8 +100,6 @@ export default function LoginPage() {
                 </div>
 
                 <form className="login-card" onSubmit={handleSubmit}>
-                    <p className="eyebrow">DATA ANALYSIS CHATBOT</p>
-
                     <h2 className="login-card-title">Sign in</h2>
 
                     <label className="input-label">
@@ -147,7 +143,7 @@ export default function LoginPage() {
                                 style={{
                                     background: "none",
                                     border: "none",
-                                    color: "#8ab4ff",
+                                    color: "var(--color-accent)",
                                     cursor: "pointer",
                                     fontFamily: "inherit",
                                     fontSize: "0.82rem",
