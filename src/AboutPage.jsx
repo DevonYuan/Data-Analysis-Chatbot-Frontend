@@ -29,6 +29,21 @@ function MermaidBlock({ children }) {
 }
 
 // ---------------------------------------------------------------------------
+// Block code wrapper — react-markdown v10 renders <pre><code> for fenced blocks.
+// We intercept at the <pre> level so we can detect the language on the child.
+// ---------------------------------------------------------------------------
+function PreRenderer({ children }) {
+    // children is a single <code> element in the normal case
+    const child = Array.isArray(children) ? children[0] : children
+    const lang = (child?.props?.className || "").replace("language-", "")
+    if (lang === "mermaid") {
+        const src = child?.props?.children ?? ""
+        return <MermaidBlock>{src}</MermaidBlock>
+    }
+    return <pre>{children}</pre>
+}
+
+// ---------------------------------------------------------------------------
 // Sidebar SVG Timeline
 // ---------------------------------------------------------------------------
 function TimelineSVG({ sections, activeIdx, onDotClick }) {
@@ -159,25 +174,9 @@ function H3Renderer({ children }) {
     return <h3>{children}</h3>
 }
 
-function CodeRenderer({ className, children, ...rest }) {
-    const lang    = (className || "").replace("language-", "")
-    const isBlock = !rest.inline
-
-    if (isBlock && lang === "mermaid") {
-        return <MermaidBlock>{String(children).trim()}</MermaidBlock>
-    }
-    if (isBlock) {
-        return (
-            <pre>
-                <code className={className}>{children}</code>
-            </pre>
-        )
-    }
-    return <code className={className} {...rest}>{children}</code>
-}
-
-function PreRenderer({ children }) {
-    return <>{children}</>
+// Inline <code> renderer — react-markdown v10 calls this only for inline code
+function CodeRenderer({ className, children }) {
+    return <code className={className}>{children}</code>
 }
 
 // ---------------------------------------------------------------------------
@@ -192,6 +191,27 @@ export default function AboutPage() {
     const [activeIdx, setActiveIdx] = useState(0)
     const headingRefs  = useRef({})
     const observerRef  = useRef(null)
+
+    // globals.css sets html,body { overflow: hidden } for the 3D landing page.
+    // Override it while the About page is mounted so content can scroll.
+    useEffect(() => {
+        const html = document.documentElement
+        const body = document.body
+        const prevHtmlOverflow = html.style.overflow
+        const prevBodyOverflow = body.style.overflow
+        const prevHtmlHeight   = html.style.height
+        const prevBodyHeight   = body.style.height
+        html.style.overflow = "unset"
+        body.style.overflow = "unset"
+        html.style.height   = "auto"
+        body.style.height   = "auto"
+        return () => {
+            html.style.overflow = prevHtmlOverflow
+            body.style.overflow = prevBodyOverflow
+            html.style.height   = prevHtmlHeight
+            body.style.height   = prevBodyHeight
+        }
+    }, [])
 
     // Build component map — recreated when headingRefs changes (stable ref object)
     const H2Renderer = makeH2Renderer(headingRefs)
