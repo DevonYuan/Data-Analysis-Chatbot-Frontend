@@ -143,6 +143,13 @@ export default function HomePage() {
                             >
                                 Log in
                             </Link>
+
+                            <Link
+                                to="/about"
+                                className="nav-button button button-glass hover-lift"
+                            >
+                                About
+                            </Link>
                         </div>
                     </div>
                 </div>

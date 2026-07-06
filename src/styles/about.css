@@ -1,0 +1,534 @@
+/* =========================
+   ABOUT PAGE
+   Editorial / magazine layout
+   Cream background · serif headings · rust accent
+========================= */
+
+/* -------------------------
+   PAGE SHELL
+   Overrides the global overflow:hidden so the page can scroll
+------------------------- */
+.about-page {
+    width: 100vw;
+    min-height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: #f5f1ea;
+    color: var(--color-ink);
+    position: relative;
+}
+
+/* Subtle grain identical to landing page */
+.about-grain {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 200px 200px;
+}
+
+/* -------------------------
+   BACK BUTTON
+------------------------- */
+.about-back-btn {
+    position: fixed;
+    top: 28px;
+    left: 32px;
+    z-index: 100;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--color-ink-2);
+    text-decoration: none;
+    padding: 8px 14px;
+    border-radius: var(--radius-pill);
+    background: rgba(245, 241, 234, 0.88);
+    border: 1px solid var(--color-border-strong);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: color 0.18s ease, background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+}
+
+.about-back-btn:hover {
+    color: var(--color-ink);
+    background: #ece7df;
+    border-color: var(--color-ink-3);
+    transform: translateX(-2px);
+}
+
+.about-back-arrow {
+    font-size: 1rem;
+    line-height: 1;
+    display: inline-block;
+    transition: transform 0.18s ease;
+}
+
+.about-back-btn:hover .about-back-arrow {
+    transform: translateX(-2px);
+}
+
+/* -------------------------
+   BODY LAYOUT
+   sidebar (15%) + content (85%)
+------------------------- */
+.about-layout {
+    display: flex;
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+    padding-top: 100px; /* clear back button */
+    padding-bottom: 100px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-left: 32px;
+    padding-right: 56px;
+    gap: 0;
+}
+
+/* -------------------------
+   LEFT SIDEBAR — TIMELINE
+------------------------- */
+.about-sidebar {
+    width: 15%;
+    min-width: 100px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 100px;
+    align-self: flex-start;
+    height: calc(100vh - 120px);
+    overflow: visible;
+}
+
+.about-timeline-svg {
+    display: block;
+    width: 100%;
+    overflow: visible;
+}
+
+/* Spine line */
+.timeline-spine {
+    stroke: #d4cfc6;
+    stroke-width: 1.5;
+}
+
+/* Connector lines (dot → heading level) */
+.timeline-connector {
+    stroke: #d4cfc6;
+    stroke-width: 1;
+    stroke-dasharray: 3 4;
+    transition: stroke 0.25s ease;
+}
+
+.timeline-connector.active {
+    stroke: var(--color-accent);
+}
+
+/* Dots */
+.timeline-dot {
+    fill: #f5f1ea;
+    stroke: #b8b0a4;
+    stroke-width: 1.5;
+    cursor: pointer;
+    transition: fill 0.25s ease, stroke 0.25s ease, r 0.2s ease;
+}
+
+.timeline-dot.active {
+    fill: var(--color-accent);
+    stroke: var(--color-accent);
+    r: 6;
+}
+
+.timeline-dot:hover {
+    stroke: var(--color-accent);
+}
+
+/* Section labels alongside dots */
+.timeline-label {
+    font-family: var(--font-body);
+    font-size: 9.5px;
+    fill: #9a9087;
+    transition: fill 0.25s ease;
+    letter-spacing: 0.02em;
+}
+
+.timeline-label.active {
+    fill: var(--color-accent);
+    font-weight: 600;
+}
+
+/* -------------------------
+   RIGHT CONTENT AREA
+------------------------- */
+.about-content {
+    flex: 1;
+    min-width: 0;
+    padding-left: 48px;
+}
+
+/* -------------------------
+   MARKDOWN TYPOGRAPHY
+   Each element hand-styled to match the editorial theme
+------------------------- */
+
+/* h1 — big editorial display */
+.about-md h1 {
+    font-family: var(--font-display);
+    font-size: 3.2rem;
+    line-height: 1.06;
+    color: var(--color-ink);
+    margin: 0 0 10px;
+    letter-spacing: -0.02em;
+}
+
+/* Red rule beneath h1 */
+.about-md h1::after {
+    content: "";
+    display: block;
+    width: 44px;
+    height: 3px;
+    background: var(--color-accent);
+    border-radius: 2px;
+    margin-top: 18px;
+    margin-bottom: 0;
+}
+
+/* h2 — section headings with left accent mark */
+.about-md h2 {
+    font-family: var(--font-display);
+    font-size: 1.65rem;
+    line-height: 1.2;
+    color: var(--color-ink);
+    margin: 64px 0 16px;
+    padding-top: 8px;
+    letter-spacing: -0.01em;
+    position: relative;
+    scroll-margin-top: 120px;
+}
+
+.about-md h2::before {
+    content: "";
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    vertical-align: middle;
+    margin-right: 12px;
+    margin-bottom: 2px;
+    flex-shrink: 0;
+}
+
+/* h3 — sub-sections */
+.about-md h3 {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    line-height: 1.3;
+    color: var(--color-ink);
+    margin: 36px 0 10px;
+    letter-spacing: -0.005em;
+}
+
+/* Paragraphs */
+.about-md p {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--color-ink-2);
+    margin: 0 0 20px;
+    max-width: 680px;
+}
+
+/* Strong */
+.about-md strong {
+    font-weight: 600;
+    color: var(--color-ink);
+}
+
+/* Em */
+.about-md em {
+    font-style: italic;
+    color: var(--color-ink);
+}
+
+/* Lists */
+.about-md ul,
+.about-md ol {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--color-ink-2);
+    margin: 0 0 20px;
+    padding-left: 0;
+    list-style: none;
+    max-width: 680px;
+}
+
+.about-md ul li {
+    position: relative;
+    padding-left: 22px;
+    margin-bottom: 6px;
+}
+
+.about-md ul li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 10px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    opacity: 0.75;
+}
+
+.about-md ol {
+    counter-reset: ol-counter;
+}
+
+.about-md ol li {
+    position: relative;
+    padding-left: 28px;
+    margin-bottom: 6px;
+    counter-increment: ol-counter;
+}
+
+.about-md ol li::before {
+    content: counter(ol-counter) ".";
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 600;
+    font-size: 0.88rem;
+    top: 1px;
+}
+
+/* Inline code */
+.about-md code {
+    font-family: var(--font-mono, "JetBrains Mono", monospace);
+    font-size: 0.86em;
+    background: #ede8df;
+    color: #8b3622;
+    border-radius: 4px;
+    padding: 2px 6px;
+}
+
+/* Code blocks (pre > code) */
+.about-md pre {
+    background: #1e1c19;
+    border-radius: var(--radius-md);
+    padding: 24px 28px;
+    overflow-x: auto;
+    margin: 28px 0;
+    border: 1px solid #2e2b26;
+    max-width: 720px;
+}
+
+.about-md pre code {
+    background: none;
+    color: #d4cfc7;
+    font-size: 0.87rem;
+    padding: 0;
+    border-radius: 0;
+    line-height: 1.65;
+}
+
+/* Blockquote */
+.about-md blockquote {
+    border-left: 3px solid var(--color-accent);
+    margin: 28px 0;
+    padding: 4px 0 4px 24px;
+    max-width: 620px;
+}
+
+.about-md blockquote p {
+    font-style: italic;
+    color: var(--color-ink-2);
+    margin: 0;
+    font-size: 1.05rem;
+    line-height: 1.7;
+}
+
+/* Horizontal rule */
+.about-md hr {
+    border: none;
+    border-top: 1px solid var(--color-border);
+    margin: 48px 0;
+    max-width: 680px;
+}
+
+/* Links */
+.about-md a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: rgba(192, 68, 43, 0.35);
+    transition: text-decoration-color 0.18s ease, color 0.18s ease;
+}
+
+.about-md a:hover {
+    color: var(--color-accent-hover);
+    text-decoration-color: var(--color-accent-hover);
+}
+
+/* Tables */
+.about-md table {
+    width: 100%;
+    max-width: 680px;
+    border-collapse: collapse;
+    margin: 28px 0;
+    font-size: 0.92rem;
+}
+
+.about-md th {
+    font-family: var(--font-body);
+    font-weight: 600;
+    text-align: left;
+    color: var(--color-ink);
+    border-bottom: 2px solid var(--color-border-strong);
+    padding: 10px 14px;
+}
+
+.about-md td {
+    color: var(--color-ink-2);
+    border-bottom: 1px solid var(--color-border);
+    padding: 10px 14px;
+    line-height: 1.5;
+}
+
+.about-md tr:last-child td {
+    border-bottom: none;
+}
+
+/* -------------------------
+   MERMAID DIAGRAM (code block fallback)
+   Shown as a styled code panel since we don't bundle mermaid
+------------------------- */
+.about-md-mermaid {
+    background: #f0ece4;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 20px 24px;
+    margin: 28px 0;
+    max-width: 680px;
+}
+
+.about-md-mermaid-label {
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--color-ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 12px;
+}
+
+.about-md-mermaid pre {
+    background: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.about-md-mermaid pre code {
+    color: var(--color-ink-2) !important;
+    font-size: 0.82rem !important;
+}
+
+/* -------------------------
+   MOBILE HORIZONTAL PROGRESS BAR
+   Replaces the sidebar on narrow screens
+------------------------- */
+.about-progress-bar-wrap {
+    display: none;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: #f5f1ea;
+    border-bottom: 1px solid var(--color-border);
+    padding: 12px 20px 10px;
+}
+
+.about-progress-track {
+    width: 100%;
+    height: 3px;
+    background: var(--color-border);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.about-progress-fill {
+    height: 100%;
+    background: var(--color-accent);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+.about-progress-label {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    color: var(--color-ink-3);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.about-progress-label span:last-child {
+    color: var(--color-accent);
+    font-weight: 500;
+}
+
+/* -------------------------
+   RESPONSIVE
+------------------------- */
+@media (max-width: 768px) {
+    .about-layout {
+        padding: 20px 20px 80px;
+        padding-top: 16px;
+    }
+
+    .about-sidebar {
+        display: none;
+    }
+
+    .about-content {
+        padding-left: 0;
+    }
+
+    .about-progress-bar-wrap {
+        display: block;
+    }
+
+    .about-back-btn {
+        top: auto;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        position: fixed;
+    }
+
+    .about-back-btn:hover {
+        transform: translateX(-50%);
+    }
+
+    .about-md h1 {
+        font-size: 2.1rem;
+    }
+
+    .about-md h2 {
+        font-size: 1.35rem;
+        margin-top: 48px;
+    }
+}
+
+@media (max-width: 480px) {
+    .about-md h1 {
+        font-size: 1.75rem;
+    }
+}
