@@ -4,7 +4,7 @@ import { OrbitControls } from "@react-three/drei";
 import { getChats, createChat, deleteChat } from "./api/chats";
 import { sendMessage, getMessages } from "./api/messages";
 import { uploadFile } from "./api/upload";
-import { logout } from "./api/auth";
+import { logout, getUserProfile } from "./api/auth";
 import { useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -55,18 +55,33 @@ export default function ChatDashboard() {
     const [shouldSendOnCreate, setShouldSendOnCreate] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [rateLimitError, setRateLimitError] = useState(null);
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
 
     const username = localStorage.getItem("username") || "";
 
-    function getAvatarInitials(email) {
-        if (!email) return "??";
-        const firstChar = email.charAt(0).toUpperCase();
-        const atIndex = email.indexOf("@");
-        const afterAtChar = atIndex !== -1 ? email.charAt(atIndex + 1).toUpperCase() : "";
-        return firstChar + afterAtChar;
+    function getAvatarInitials(first, last) {
+        if (!first && !last) return "??";
+        const firstInitial = first ? first.charAt(0).toUpperCase() : "";
+        const lastInitial = last ? last.charAt(0).toUpperCase() : "";
+        return firstInitial + lastInitial || "??";
     }
+
+    useEffect(() => {
+        async function loadProfile() {
+            try {
+                const profile = await getUserProfile();
+                setFirstName(profile.first_name || "")
+                setLastName(profile.last_name || "")
+            } catch (error) {
+                console.error("Failed to load user profile:", error)
+            }
+        }
+
+        loadProfile();
+    }, []);
 
     useEffect(() => {
         if (messagesEndRef.current) {
@@ -319,8 +334,8 @@ export default function ChatDashboard() {
                 </div>
 
                 <div className="sidebar-user">
-                    <div className="sidebar-user-name">{username}</div>
-                    <div className="sidebar-user-avatar">{getAvatarInitials(username)}</div>
+                    <div className="sidebar-user-name">{firstName} {lastName}</div>
+                    <div className="sidebar-user-avatar">{getAvatarInitials(firstName, lastName)}</div>
                 </div>
 
             </aside>

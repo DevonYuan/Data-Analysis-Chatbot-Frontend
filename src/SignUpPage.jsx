@@ -9,7 +9,8 @@ import "./styles/components.css"
 import "./styles/auth.css"
 
 export default function SignupPage() {
-    const [name, setName] = useState("")
+    const [firstName, setFirstName] = useState("")
+    const [lastName, setLastName] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
@@ -20,6 +21,11 @@ export default function SignupPage() {
     async function handleSubmit(event) {
         event.preventDefault()
 
+        if (!firstName.trim() || !lastName.trim()) {
+            showToast("Please enter both your first and last name.", "error")
+            return
+        }
+
         if (password !== confirmPassword) {
             showToast("Passwords do not match.", "error")
             return
@@ -28,7 +34,7 @@ export default function SignupPage() {
         try {
             setIsLoading(true)
 
-            const result = await register(email, password)
+            const result = await register(email, password, firstName, lastName)
             const message = String(result.message || result).trim()
 
             console.log("Signup result:", message)
@@ -91,13 +97,25 @@ export default function SignupPage() {
                     <h2 className="login-card-title">Create account</h2>
 
                     <label className="input-label">
-                        Name
+                        First name
                         <input
                             className="login-input"
                             type="text"
-                            placeholder="Your name"
-                            value={name}
-                            onChange={(event) => setName(event.target.value)}
+                            placeholder="John"
+                            value={firstName}
+                            onChange={(event) => setFirstName(event.target.value)}
+                            required
+                        />
+                    </label>
+
+                    <label className="input-label">
+                        Last name
+                        <input
+                            className="login-input"
+                            type="text"
+                            placeholder="Doe"
+                            value={lastName}
+                            onChange={(event) => setLastName(event.target.value)}
                             required
                         />
                     </label>

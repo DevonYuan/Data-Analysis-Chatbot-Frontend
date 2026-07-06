@@ -44,7 +44,7 @@ export async function login(username, password) {
     return data
 }
 
-export async function register(username, password) {
+export async function register(username, password, firstName, lastName) {
     const res = await fetch(`${API}/register`, {
         method: "POST",
         headers: {
@@ -53,6 +53,8 @@ export async function register(username, password) {
         body: new URLSearchParams({
             username,
             password,
+            first_name: firstName,
+            last_name: lastName,
         }),
     })
 
@@ -74,6 +76,32 @@ export async function register(username, password) {
     }
 
     return data
+}
+
+export async function getUserProfile() {
+    const token = localStorage.getItem("access_token")
+    if (!token) {
+        throw new Error("Not authenticated")
+    }
+
+    const res = await fetch(`${API}/get-user-profile`, {
+        method: "GET",
+        headers: {
+            "Authorization": `Bearer ${token}`,
+        },
+    })
+
+    if (res.status === 429) {
+        const data = await res.json().catch(() => ({}));
+        throw new RateLimitError(data.detail || "Too many requests. Please wait and try again.");
+    }
+
+    if (!res.ok) {
+        const data = await readResponse(res)
+        throw new Error(typeof data === "string" ? data : JSON.stringify(data))
+    }
+
+    return await readResponse(res)
 }
 
 export async function logout() {
