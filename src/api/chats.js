@@ -2,8 +2,9 @@ import { RateLimitError } from "./errors";
 import { postForm } from "./apiClient";
 
 export async function getChats() {
+    const apiUrl = (import.meta.env.VITE_API_URL ?? "").replace(/\/$/, "")
     const res = await fetch(
-        `${import.meta.env.VITE_API_URL.replace(/\/$/, "")}/get-chats`,
+        `${apiUrl}/get-chats`,
         {
             headers: {
                 "Authorization": `Bearer ${localStorage.getItem("access_token")}`,

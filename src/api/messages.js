@@ -1,7 +1,7 @@
 import { RateLimitError } from "./errors";
 import { postForm, get } from "./apiClient";
 
-const API = import.meta.env.VITE_API_URL.replace(/\/$/, "")
+const API = (import.meta.env.VITE_API_URL ?? "").replace(/\/$/, "")
 
 export async function sendMessage(title, message) {
     const username = localStorage.getItem("username")
