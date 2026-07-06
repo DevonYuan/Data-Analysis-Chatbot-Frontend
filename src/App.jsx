@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react"
 import { Routes, Route, Navigate } from "react-router-dom"
 import HomePage from "./HomePage"
 import LoginPage from "./LoginPage"
@@ -12,6 +13,8 @@ import "./styles/globals.css"
 import "./styles/landing.css"
 import "./styles/layout.css"
 import "./styles/sidebar.css"
+
+const AboutPage = lazy(() => import("./AboutPage"))
 
 function RequireAuth({ children }) {
     const token = localStorage.getItem("access_token")
@@ -30,6 +33,14 @@ export default function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/verify-email" element={<VerifyEmailPage />} />
+            <Route
+                path="/about"
+                element={
+                    <Suspense fallback={null}>
+                        <AboutPage />
+                    </Suspense>
+                }
+            />
 
             <Route
                 path="/chat"
