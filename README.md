@@ -37,3 +37,8 @@ flowchart TD
 **For Local Development:** <br>
 - The VITE_API_URL was set to the locally running backend for testing and further development 
 
+## Security Features
+- Encryption 
+- JWT based authentication
+- Email verification on signup 
+- API Rate Limiting 
