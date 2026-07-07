@@ -426,10 +426,10 @@ export default function AboutPage() {
             <div className="about-grain" aria-hidden="true" />
 
             {/* Back button */}
-            <Link to="/" className="about-back-btn" aria-label="Back to home">
+            <a href="/" className="about-back-btn" aria-label="Back to home">
                 <span className="about-back-arrow" aria-hidden="true">&#8592;</span>
                 Back
-            </Link>
+            </a>
 
             {/* Mobile progress bar (hidden on desktop via CSS) */}
             <MobileProgressBar sections={sections} activeIdx={activeIdx} />
