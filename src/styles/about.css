@@ -8,14 +8,25 @@
    PAGE SHELL
    Overrides the global overflow:hidden so the page can scroll
 ------------------------- */
+.hide-scroll {
+    scrollbar-width: none;
+}
+.hide-scroll::-webkit-scrollbar {
+    display: none;
+}
 .about-page {
-    width: 100vw;
+    width: 100%;
     min-height: 100vh;
     overflow-y: auto;
     overflow-x: hidden;
     background: #f5f1ea;
     color: var(--color-ink);
     position: relative;
+    
+    scrollbar-width: none; /* Firefox */
+}
+.about-page::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
 }
 
 /* Subtle grain identical to landing page */
@@ -95,19 +106,18 @@
    LEFT SIDEBAR — TIMELINE
 ------------------------- */
 .about-sidebar {
-    width: 15%;
-    min-width: 100px;
+    width: 220px;
     flex-shrink: 0;
-    position: sticky;
-    top: 100px;
-    align-self: flex-start;
-    height: calc(100vh - 120px);
-    overflow: visible;
+    position: relative;
 }
 
 .about-timeline-svg {
     display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
+    height: 100%;
     overflow: visible;
 }
 
@@ -162,13 +172,51 @@
     font-weight: 600;
 }
 
+/* Upward branch lines (git-style) */
+.timeline-branch {
+    stroke: #c4beb5;
+    stroke-width: 1.5;
+    transition: stroke 0.25s ease;
+}
+
+.timeline-branch.active {
+    stroke: var(--color-accent);
+}
+
+/* Branch termination dots */
+.timeline-branch-dot {
+    fill: #f5f1ea;
+    stroke: #c4beb5;
+    stroke-width: 1;
+    transition: fill 0.25s ease, stroke 0.25s ease;
+}
+
+.timeline-branch-dot.active {
+    fill: var(--color-accent);
+    stroke: var(--color-accent);
+}
+
+/* Commit hash labels */
+.timeline-commit-hash {
+    font-family: var(--font-mono, "JetBrains Mono", monospace);
+    font-size: 7px;
+    fill: #a89a8f;
+    transition: fill 0.25s ease;
+    letter-spacing: 0.05em;
+}
+
+.timeline-commit-hash.active {
+    fill: var(--color-accent);
+    font-weight: 600;
+}
+
 /* -------------------------
    RIGHT CONTENT AREA
 ------------------------- */
 .about-content {
     flex: 1;
     min-width: 0;
-    padding-left: 48px;
+    padding-left: 24px;
 }
 
 /* -------------------------
@@ -211,18 +259,7 @@
     scroll-margin-top: 120px;
 }
 
-.about-md h2::before {
-    content: "";
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--color-accent);
-    vertical-align: middle;
-    margin-right: 12px;
-    margin-bottom: 2px;
-    flex-shrink: 0;
-}
+
 
 /* h3 — sub-sections */
 .about-md h3 {
@@ -406,8 +443,8 @@
 }
 
 /* -------------------------
-   MERMAID DIAGRAM (code block fallback)
-   Shown as a styled code panel since we don't bundle mermaid
+   MERMAID DIAGRAM
+   Rendered live via the mermaid library
 ------------------------- */
 .about-md-mermaid {
     background: #f0ece4;
@@ -426,6 +463,17 @@
     text-transform: uppercase;
     letter-spacing: 0.06em;
     margin-bottom: 12px;
+}
+
+.about-mermaid-render {
+    display: flex;
+    justify-content: center;
+    overflow-x: auto;
+}
+
+.about-mermaid-render svg {
+    max-width: 100%;
+    height: auto;
 }
 
 .about-md-mermaid pre {
@@ -482,6 +530,42 @@
 .about-progress-label span:last-child {
     color: var(--color-accent);
     font-weight: 500;
+}
+
+/* -------------------------
+   FLOATING REPO LINKS
+------------------------- */
+.repo-links {
+    position: fixed;
+    right: 5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    z-index: 100;
+}
+
+.repo-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 14px;
+    background: transparent;
+    color: var(--color-ink-3);
+    border: 2px solid var(--color-border);
+    transition: all 0.25s ease;
+    cursor: pointer;
+}
+
+.repo-link:hover {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+    background: var(--color-surface);
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 8px 24px rgba(192, 68, 43, 0.15);
 }
 
 /* -------------------------

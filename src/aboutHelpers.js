@@ -9,10 +9,10 @@
  * Returns an array of plain-text heading strings.
  */
 export function parseH2Headings(md) {
-    const lines = md.split("\n")
+    const lines = md.split(/\r?\n/)
     const headings = []
     for (const line of lines) {
-        const m = line.match(/^##\s+(.+)$/)
+        const m = line.match(/^#{1,2}\s+(.+)$/)
         if (m) headings.push(m[1].trim())
     }
     return headings
