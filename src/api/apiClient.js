@@ -54,7 +54,12 @@ export async function postForm(endpoint, formData) {
         throw new Error(text)
     }
 
-    return text
+    try {
+        const parsed = JSON.parse(text)
+        return typeof parsed === 'string' ? parsed : text
+    } catch {
+        return text
+    }
 }
 
 export async function postMultipart(endpoint, formData) {
@@ -77,5 +82,10 @@ export async function postMultipart(endpoint, formData) {
         throw new Error(text)
     }
 
-    return text
+    try {
+        const parsed = JSON.parse(text)
+        return typeof parsed === 'string' ? parsed : text
+    } catch {
+        return text
+    }
 }

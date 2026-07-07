@@ -57,6 +57,7 @@ export default function ChatDashboard() {
     const [rateLimitError, setRateLimitError] = useState(null);
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
+    const [pendingFile, setPendingFile] = useState(null);
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
 
@@ -102,7 +103,16 @@ export default function ChatDashboard() {
 
             setIsNewChatModalOpen(false);
 
-            if (shouldSendOnCreate && input.trim()) {
+            if (pendingFile) {
+                setMessages([]);
+                await processFileUpload(title, pendingFile);
+                if (shouldSendOnCreate && input.trim()) {
+                    setMessages((prev) => [...prev, { sender: "user", text: input }]);
+                    const reply = await sendMessage(title, input);
+                    setMessages((prev) => [...prev, { sender: "ai", text: reply }]);
+                    setInput("");
+                }
+            } else if (shouldSendOnCreate && input.trim()) {
                 setMessages([{ sender: "user", text: input }]);
                 const reply = await sendMessage(title, input);
                 setMessages((prev) => [...prev, { sender: "ai", text: reply }]);
@@ -181,19 +191,10 @@ export default function ChatDashboard() {
         setInput("");
     }
 
-    async function handleFileUpload(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        if (!currentChat) {
-            alert("Please create or select a chat first before uploading a file.");
-            fileInputRef.current.value = "";
-            return;
-        }
-
+    async function processFileUpload(chatTitle, file) {
         try {
             setIsUploading(true);
-            const result = await uploadFile(currentChat, file);
+            const result = await uploadFile(chatTitle, file);
             setMessages((prev) => [...prev, { sender: "user", text: `Uploaded file: ${file.name}` }]);
             setMessages((prev) => [...prev, { sender: "ai", text: `File uploaded successfully to bucket storage. You can now ask questions about your data.` }]);
         } catch (error) {
@@ -205,8 +206,24 @@ export default function ChatDashboard() {
             }
         } finally {
             setIsUploading(false);
-            fileInputRef.current.value = "";
+            if (fileInputRef.current) fileInputRef.current.value = "";
+            setPendingFile(null);
         }
+    }
+
+    async function handleFileUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        if (!currentChat) {
+            setPendingFile(file);
+            setShouldSendOnCreate(true);
+            setIsNewChatModalOpen(true);
+            if (fileInputRef.current) fileInputRef.current.value = "";
+            return;
+        }
+
+        await processFileUpload(currentChat, file);
     }
 
     useEffect(() => {
