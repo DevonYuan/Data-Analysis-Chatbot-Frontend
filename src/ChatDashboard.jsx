@@ -388,7 +388,7 @@ export default function ChatDashboard() {
                     <div className="chat-welcome-card">
                         <h1 className="chat-welcome-title">Start a new analysis</h1>
                         <p className="chat-welcome-subtitle">
-                            Upload a CSV and ask a question, or try one of these to get started.
+                            Upload a dataset (CSV, TSV, Excel, TXT, JSON, Parquet, Feather) and ask a question, or try one of these to get started.
                         </p>
 
                         <div className="chat-example-prompts">
@@ -434,7 +434,7 @@ export default function ChatDashboard() {
                         type="file"
                         ref={fileInputRef}
                         style={{ display: "none" }}
-                        accept=".csv,.tsv,.xlsx"
+                        accept=".csv,.tsv,.xlsx,.xls,.txt,.json,.parquet,.feather"
                         onChange={handleFileUpload}
                     />
                     <button
