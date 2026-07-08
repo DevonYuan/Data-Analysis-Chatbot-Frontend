@@ -58,6 +58,7 @@ export default function ChatDashboard() {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [pendingFile, setPendingFile] = useState(null);
+    const skipMessageLoadRef = useRef(false);
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
 
@@ -99,13 +100,16 @@ export default function ChatDashboard() {
             const updated = await getChats();
             setChats(updated);
 
-            setCurrentChat(title);
-
             setIsNewChatModalOpen(false);
 
             if (pendingFile) {
+                skipMessageLoadRef.current = true;
                 setMessages([]);
                 await processFileUpload(title, pendingFile);
+                setCurrentChat(title);
+                setTimeout(() => {
+                    skipMessageLoadRef.current = false;
+                }, 200);
                 if (shouldSendOnCreate && input.trim()) {
                     setMessages((prev) => [...prev, { sender: "user", text: input }]);
                     const reply = await sendMessage(title, input);
@@ -113,11 +117,13 @@ export default function ChatDashboard() {
                     setInput("");
                 }
             } else if (shouldSendOnCreate && input.trim()) {
+                setCurrentChat(title);
                 setMessages([{ sender: "user", text: input }]);
                 const reply = await sendMessage(title, input);
                 setMessages((prev) => [...prev, { sender: "ai", text: reply }]);
                 setInput("");
             } else {
+                setCurrentChat(title);
                 setMessages([]);
             }
             setShouldSendOnCreate(false);
@@ -247,6 +253,11 @@ export default function ChatDashboard() {
     useEffect(() => {
         if (!currentChat) {
             setMessages([]);
+            return;
+        }
+
+        // Skip loading messages if we're uploading to a new chat
+        if (skipMessageLoadRef.current) {
             return;
         }
 
