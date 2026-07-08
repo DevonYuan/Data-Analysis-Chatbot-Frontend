@@ -58,6 +58,7 @@ export default function ChatDashboard() {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [pendingFile, setPendingFile] = useState(null);
+    const [isSending, setIsSending] = useState(false);
     const skipMessageLoadRef = useRef(false);
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
@@ -177,8 +178,12 @@ export default function ChatDashboard() {
 
         if (!input.trim()) return;
 
+        if (isSending) return;
+
         // Add user message to UI
         setMessages((prev) => [...prev, { sender: "user", text: input }]);
+        setInput("");
+        setIsSending(true);
 
         try {
             const reply = await sendMessage(title, input);
@@ -192,9 +197,9 @@ export default function ChatDashboard() {
             } else {
                 console.error("Failed to send message:", error);
             }
+        } finally {
+            setIsSending(false);
         }
-
-        setInput("");
     }
 
     async function processFileUpload(chatTitle, file) {
@@ -452,7 +457,7 @@ export default function ChatDashboard() {
                         }}
                     />
 
-                    <button className="chat-send-button" onClick={handleSend}>→</button>
+                    <button className="chat-send-button" onClick={handleSend} disabled={isSending}>→</button>
                 </div>
             </main>
         </div>
