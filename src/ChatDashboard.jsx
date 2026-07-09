@@ -60,6 +60,7 @@ export default function ChatDashboard() {
     const [pendingFile, setPendingFile] = useState(null);
     const [isSending, setIsSending] = useState(false);
     const skipMessageLoadRef = useRef(false);
+    const requestedChatRef = useRef(null);
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
 
@@ -266,21 +267,36 @@ export default function ChatDashboard() {
             return;
         }
 
+        const requestedChat = currentChat;
+        requestedChatRef.current = requestedChat;
+
         async function loadMessages() {
             try {
-                const list = await getMessages(currentChat);
-                setMessages(Array.isArray(list) ? list : []);
+                const list = await getMessages(requestedChat);
+                // Check if the request is still for the current chat
+                if (requestedChatRef.current === requestedChat) {
+                    setMessages(Array.isArray(list) ? list : []);
+                }
             } catch (error) {
                 if (error instanceof RateLimitError) {
                     setRateLimitError(error.message);
                 } else {
                     console.error("Failed to load messages:", error);
+                }
+                // Only set messages to empty if the request is still for the current chat
+                if (requestedChatRef.current === requestedChat) {
                     setMessages([]);
                 }
             }
         }
 
         loadMessages();
+
+        // We return an empty cleanup function because we cannot abort the fetch request.
+        // But we can note that if the component unmounts, the request might still complete and then be ignored by the check above.
+        return () => {
+            // No cleanup needed for now.
+        };
     }, [currentChat]);
 
     return (
