@@ -26,3 +26,23 @@ export async function getMessages(title) {
     }
     return res.json();
 }
+
+export async function getGraphData(title, graphType = 'histogram', column = null) {
+    let url = `${API}/get-graph-data?title=${encodeURIComponent(title)}&graph_type=${encodeURIComponent(graphType)}`;
+    if (column) {
+        url += `&column=${encodeURIComponent(column)}`;
+    }
+    const res = await fetch(url, {
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("access_token")}`,
+        },
+    });
+    if (res.status === 429) {
+        const data = await res.json().catch(() => ({}));
+        throw new RateLimitError(data.detail || "Too many requests. Please wait and try again.");
+    }
+    if (!res.ok) {
+        throw new Error("Failed to fetch graph data");
+    }
+    return res.json();
+}

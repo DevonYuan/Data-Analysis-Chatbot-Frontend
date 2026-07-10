@@ -4,6 +4,8 @@ import HomePage from "./HomePage"
 import LoginPage from "./LoginPage"
 import SignupPage from "./SignUpPage"
 import ChatDashboard from "./ChatDashboard"
+import Dashboard from "./Dashboard"
+import ChatAccess from "./ChatAccess"
 import VerifyEmailPage from "./VerifyEmailPage"
 
 import "./styles/auth.css"
@@ -13,6 +15,10 @@ import "./styles/globals.css"
 import "./styles/landing.css"
 import "./styles/layout.css"
 import "./styles/sidebar.css"
+import "./styles/dashboard.css"
+import "./styles/chat-access.css"
+import "./styles/chat-interface.css"
+import "./styles/graph.css"
 
 const AboutPage = lazy(() => import("./AboutPage"))
 
@@ -43,7 +49,25 @@ export default function App() {
             />
 
             <Route
-                path="/chat"
+                path="/dashboard"
+                element={
+                    <RequireAuth>
+                        <Dashboard />
+                    </RequireAuth>
+                }
+            />
+
+            <Route
+                path="/chat/:chatTitle"
+                element={
+                    <RequireAuth>
+                        <ChatAccess />
+                    </RequireAuth>
+                }
+            />
+
+            <Route
+                path="/chat-interface/:chatTitle"
                 element={
                     <RequireAuth>
                         <ChatDashboard />

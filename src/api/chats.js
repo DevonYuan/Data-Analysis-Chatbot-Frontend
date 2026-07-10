@@ -35,3 +35,28 @@ export async function deleteChat(title) {
     const username = localStorage.getItem("username")
     return postForm("/delete-chat", { username, title })
 }
+
+export async function getFilenames(chat) {
+    const apiUrl = (import.meta.env.VITE_API_URL ?? "").replace(/\/$/, "")
+    const res = await fetch(
+        `${apiUrl}/get-filenames?chat=${encodeURIComponent(chat)}`,
+        {
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem("access_token")}`,
+            },
+        }
+    )
+
+    if (res.status === 429) {
+        const data = await res.json().catch(() => ({}));
+        throw new RateLimitError(data.detail || "Too many requests. Please wait and try again.");
+    }
+
+    const data = await res.json()
+
+    if (!res.ok) {
+        throw new Error(JSON.stringify(data))
+    }
+
+    return data
+}

@@ -28,7 +28,7 @@ export default function LoginPage() {
             console.log("Login result:", message)
 
             if (message === "Logged in!") {
-                navigate("/chat", { replace: true })
+                navigate("/dashboard", { replace: true })
                 return
             }
 

@@ -1,0 +1,147 @@
+/* =========================
+   CHAT ACCESS STYLES
+========================= */
+
+.chat-access-container {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+    background: var(--color-bg);
+}
+
+.chat-access-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.chat-access-3d {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    opacity: 0.12;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chat-access-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 48px;
+    position: relative;
+    z-index: 1;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.chat-access-content::-webkit-scrollbar {
+    display: none;
+}
+
+.chat-access-back-button {
+    align-self: flex-start;
+    margin-bottom: 32px;
+}
+
+.chat-access-card {
+    max-width: 520px;
+    width: 100%;
+    margin: auto;
+    text-align: center;
+    padding: 48px;
+}
+
+.chat-access-title {
+    font-family: var(--font-display);
+    font-size: 2.2rem;
+    margin: 0 0 12px;
+    color: var(--color-ink);
+    line-height: 1.15;
+}
+
+.chat-access-subtitle {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    color: var(--color-ink-2);
+    line-height: 1.65;
+    margin: 0 0 40px;
+}
+
+.chat-access-upload-area {
+    margin-bottom: 40px;
+}
+
+.chat-access-upload-button {
+    width: 100%;
+    padding: 16px 24px;
+    font-size: 1rem;
+}
+
+.chat-access-success {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 32px;
+    background: var(--color-surface-alt);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+}
+
+.chat-access-success-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #4caf50;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+.chat-access-success-text {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--color-ink);
+    margin: 0;
+}
+
+.chat-access-success-filename {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--color-ink-2);
+    margin: 0;
+}
+
+.chat-access-info {
+    padding-top: 24px;
+    border-top: 1px solid var(--color-border);
+}
+
+.chat-access-info-title {
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-ink-3);
+    margin: 0 0 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.chat-access-info-formats {
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--color-ink-2);
+    margin: 0;
+}

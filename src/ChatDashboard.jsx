@@ -1,23 +1,20 @@
 import { useState, useRef, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
-import { getChats, createChat, deleteChat } from "./api/chats";
-import { sendMessage, getMessages } from "./api/messages";
-import { uploadFile } from "./api/upload";
-import { logout, getUserProfile } from "./api/auth";
-import { useNavigate } from "react-router-dom";
+import { sendMessage, getMessages, getGraphData } from "./api/messages";
+import GraphDisplay from "./GraphDisplay";
+import { getUserProfile } from "./api/auth";
+import { useNavigate, useParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import NewChatModal from "./NewChatModal";
-import ConfirmModal from "./ConfirmModal"
 import RateLimitModal from "./RateLimitModal"
 import { RateLimitError } from "./api/errors"
 import "./styles/globals.css";
 import "./styles/effects.css";
 import "./styles/layout.css";
 import "./styles/components.css";
-import "./styles/sidebar.css";
 import "./styles/chat.css";
+import "./styles/chat-interface.css";
 
 function BackgroundSphere() {
     const meshRef = useRef();
@@ -44,27 +41,18 @@ function BackgroundSphere() {
 
 export default function ChatDashboard() {
     const [messages, setMessages] = useState([]);
-    const [chats, setChats] = useState([]);
-    const [currentChat, setCurrentChat] = useState(null);
     const [input, setInput] = useState("");
+    const [showGraph, setShowGraph] = useState(false);
+    const [graphData, setGraphData] = useState(null);
     const navigate = useNavigate();
-    const [isNewChatModalOpen, setIsNewChatModalOpen] = useState(false);
-    const [isCreatingChat, setIsCreatingChat] = useState(false);
-    const [chatToDelete, setChatToDelete] = useState(null);
-    const [isDeletingChat, setIsDeletingChat] = useState(false);
-    const [shouldSendOnCreate, setShouldSendOnCreate] = useState(false);
-    const [isUploading, setIsUploading] = useState(false);
     const [rateLimitError, setRateLimitError] = useState(null);
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
-    const [pendingFile, setPendingFile] = useState(null);
     const [isSending, setIsSending] = useState(false);
-    const skipMessageLoadRef = useRef(false);
     const requestedChatRef = useRef(null);
     const messagesEndRef = useRef(null);
-    const fileInputRef = useRef(null);
-
-    const username = localStorage.getItem("username") || "";
+    const { chatTitle } = useParams();
+    const decodedChatTitle = decodeURIComponent(chatTitle);
 
     function getAvatarInitials(first, last) {
         if (!first && !last) return "??";
@@ -93,101 +81,19 @@ export default function ChatDashboard() {
         }
     }, [messages]);
 
-    async function handleCreateChat(title) {
-        try {
-            setIsCreatingChat(true);
-
-            await createChat(title);
-
-            const updated = await getChats();
-            setChats(updated);
-
-            setIsNewChatModalOpen(false);
-
-            if (pendingFile) {
-                skipMessageLoadRef.current = true;
-                setMessages([]);
-                await processFileUpload(title, pendingFile);
-                setCurrentChat(title);
-                setTimeout(() => {
-                    skipMessageLoadRef.current = false;
-                }, 200);
-                if (shouldSendOnCreate && input.trim()) {
-                    setMessages((prev) => [...prev, { sender: "user", text: input }]);
-                    const reply = await sendMessage(title, input);
-                    setMessages((prev) => [...prev, { sender: "ai", text: reply }]);
-                    setInput("");
-                }
-            } else if (shouldSendOnCreate && input.trim()) {
-                setCurrentChat(title);
-                setMessages([{ sender: "user", text: input }]);
-                const reply = await sendMessage(title, input);
-                setMessages((prev) => [...prev, { sender: "ai", text: reply }]);
-                setInput("");
-            } else {
-                setCurrentChat(title);
-                setMessages([]);
-            }
-            setShouldSendOnCreate(false);
-        } catch (error) {
-            if (error instanceof RateLimitError) {
-                setRateLimitError(error.message);
-            } else {
-                console.error("Failed to create chat:", error);
-            }
-        } finally {
-            setIsCreatingChat(false);
-        }
-    }
-
-    async function handleDeleteChat() {
-        if (!chatToDelete) return
-
-        try {
-            setIsDeletingChat(true)
-
-            await deleteChat(chatToDelete)
-
-            const updated = await getChats()
-            setChats(updated)
-
-            if (currentChat === chatToDelete) {
-                setCurrentChat(null)
-                setMessages([])
-            }
-
-            setChatToDelete(null)
-        } catch (error) {
-            if (error instanceof RateLimitError) {
-                setRateLimitError(error.message);
-            } else {
-                console.error("Failed to delete chat:", error);
-            }
-        } finally {
-            setIsDeletingChat(false)
-        }
-    }
-
     async function handleSend() {
-        const title = currentChat;
-
-        if (!currentChat) {
-            setShouldSendOnCreate(true);
-            setIsNewChatModalOpen(true);
-            return;
-        }
-
         if (!input.trim()) return;
 
         if (isSending) return;
 
+        const userMessage = input;
         // Add user message to UI
-        setMessages((prev) => [...prev, { sender: "user", text: input }]);
+        setMessages((prev) => [...prev, { sender: "user", text: userMessage }]);
         setInput("");
         setIsSending(true);
 
         try {
-            const reply = await sendMessage(title, input);
+            const reply = await sendMessage(decodedChatTitle, userMessage);
             // Add AI message to UI
             setMessages((prev) => [...prev, { sender: "ai", text: reply }]);
         } catch (error) {
@@ -203,71 +109,13 @@ export default function ChatDashboard() {
         }
     }
 
-    async function processFileUpload(chatTitle, file) {
-        try {
-            setIsUploading(true);
-            const result = await uploadFile(chatTitle, file);
-            setMessages((prev) => [...prev, { sender: "user", text: `Uploaded file: ${file.name}` }]);
-            setMessages((prev) => [...prev, { sender: "ai", text: `File uploaded successfully to bucket storage. You can now ask questions about your data.` }]);
-        } catch (error) {
-            if (error instanceof RateLimitError) {
-                setRateLimitError(error.message);
-            } else {
-                console.error("Failed to upload file:", error);
-                alert(`Failed to upload file: ${error.message}`);
-            }
-        } finally {
-            setIsUploading(false);
-            if (fileInputRef.current) fileInputRef.current.value = "";
-            setPendingFile(null);
-        }
-    }
-
-    async function handleFileUpload(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        if (!currentChat) {
-            setPendingFile(file);
-            setShouldSendOnCreate(true);
-            setIsNewChatModalOpen(true);
-            if (fileInputRef.current) fileInputRef.current.value = "";
-            return;
-        }
-
-        await processFileUpload(currentChat, file);
-    }
-
     useEffect(() => {
-        async function loadChats() {
-            try {
-                const list = await getChats();
-                setChats(Array.isArray(list) ? list : []);
-            } catch (error) {
-                if (error instanceof RateLimitError) {
-                    setRateLimitError(error.message);
-                } else {
-                    console.error("Failed to load chats:", error);
-                    setChats([]);
-                }
-            }
-        }
-
-        loadChats();
-    }, []);
-
-    useEffect(() => {
-        if (!currentChat) {
+        if (!decodedChatTitle) {
             setMessages([]);
             return;
         }
 
-        // Skip loading messages if we're uploading to a new chat
-        if (skipMessageLoadRef.current) {
-            return;
-        }
-
-        const requestedChat = currentChat;
+        const requestedChat = decodedChatTitle;
         requestedChatRef.current = requestedChat;
 
         async function loadMessages() {
@@ -290,109 +138,58 @@ export default function ChatDashboard() {
             }
         }
 
+        async function loadInitialGraph() {
+            try {
+                const data = await getGraphData(requestedChat);
+                if (requestedChatRef.current === requestedChat) {
+                    setGraphData(data);
+                    setShowGraph(true);
+                }
+            } catch (error) {
+                console.error("Failed to load graph data:", error);
+                if (requestedChatRef.current === requestedChat) {
+                    setShowGraph(false);
+                }
+            }
+        }
+
         loadMessages();
+        loadInitialGraph();
 
         // We return an empty cleanup function because we cannot abort the fetch request.
         // But we can note that if the component unmounts, the request might still complete and then be ignored by the check above.
         return () => {
             // No cleanup needed for now.
         };
-    }, [currentChat]);
+    }, [decodedChatTitle]);
 
     return (
-        <div className="chat-container">
-            <NewChatModal
-                isOpen={isNewChatModalOpen}
-                onClose={() => setIsNewChatModalOpen(false)}
-                onCreate={handleCreateChat}
-                isCreating={isCreatingChat}
-                existingTitles={chats}
-            />
-
+        <div className="chat-interface-container">
             <RateLimitModal
                 isOpen={Boolean(rateLimitError)}
                 message={rateLimitError}
                 onClose={() => setRateLimitError(null)}
             />
 
-            <ConfirmModal
-                isOpen={Boolean(chatToDelete)}
-                eyebrow="DELETE CHAT"
-                title="Delete this conversation?"
-                message={`Are you sure you want to delete "${chatToDelete}"? This action cannot be undone.`}
-                confirmText="Delete Chat"
-                cancelText="Cancel"
-                danger
-                isLoading={isDeletingChat}
-                onCancel={() => setChatToDelete(null)}
-                onConfirm={handleDeleteChat}
-            />
-
-            {/* SIDEBAR */}
-            <aside className="chat-sidebar">
-
-                <h2 className="sidebar-title">Chats</h2>
-
+            {/* HEADER */}
+            <header className="chat-interface-header">
                 <button
-                    className="sidebar-back-button"
-                    onClick={async () => {
-                        try {
-                            await logout()
-                        } catch (error) {
-                            console.error("Logout failed:", error)
-                        } finally {
-                            navigate("/login")
-                        }
-                    }}
+                    className="chat-interface-back-button dashboard-logout-button"
+                    onClick={() => navigate("/dashboard")}
                 >
-                    Log out
+                    ← Back to Dashboard
                 </button>
-
-                <button
-                    className="new-chat-button"
-                    onClick={() => {
-                        setShouldSendOnCreate(false);
-                        setIsNewChatModalOpen(true);
-                    }}
-                >
-                    New Chat
-                </button>
-
-                <div className="chat-history">
-                    {chats.map((title, i) => (
-                        <div
-                            key={i}
-                            className={`chat-history-item ${currentChat === title ? "active" : ""}`}
-                            onClick={() => {
-                                setCurrentChat(title)
-                            }}
-                        >
-                            <span className="chat-history-label">{title}</span>
-
-                            <button
-                                className="chat-history-menu"
-                                onClick={(event) => {
-                                    event.stopPropagation()
-                                    setChatToDelete(title)
-                                }}
-                            >
-                                ⋯
-                            </button>
-                        </div>
-                    ))}
+                <h1 className="chat-interface-title">{decodedChatTitle}</h1>
+                <div className="chat-interface-user">
+                    <div className="dashboard-user-name">{firstName} {lastName}</div>
+                    <div className="dashboard-user-avatar">{getAvatarInitials(firstName, lastName)}</div>
                 </div>
-
-                <div className="sidebar-user">
-                    <div className="sidebar-user-name">{firstName} {lastName}</div>
-                    <div className="sidebar-user-avatar">{getAvatarInitials(firstName, lastName)}</div>
-                </div>
-
-            </aside>
+            </header>
 
             {/* MAIN PANEL */}
-            <main className="chat-main">
+            <main className="chat-interface-main">
 
-                <div className="chat-main-3d">
+                <div className="chat-interface-3d">
                     <Canvas camera={{ position: [0, 0, 7], fov: 60 }}>
                         <ambientLight intensity={0.4} />
                         <BackgroundSphere />
@@ -400,38 +197,13 @@ export default function ChatDashboard() {
                     </Canvas>
                 </div>
 
-                {!currentChat && (
-                    <div className="chat-welcome-card">
-                        <h1 className="chat-welcome-title">Start a new analysis</h1>
-                        <p className="chat-welcome-subtitle">
-                            Upload a dataset (CSV, TSV, Excel, TXT, JSON, Parquet, Feather) and ask a question, or try one of these to get started.
-                        </p>
-
-                        <div className="chat-example-prompts">
-                            {[
-                                { icon: "↗", text: "Summarize the key statistics of my dataset" },
-                                { icon: "⬡", text: "Find and explain any outliers in the data" },
-                                { icon: "≋", text: "Which columns have missing values, and how many?" },
-                                { icon: "◎", text: "Calculate the distribution of values in a column" },
-                            ].map(({ icon, text }) => (
-                                <button
-                                    key={text}
-                                    className="chat-example-prompt"
-                                    onClick={() => {
-                                        setInput(text);
-                                        setShouldSendOnCreate(true);
-                                        setIsNewChatModalOpen(true);
-                                    }}
-                                >
-                                    <span className="chat-example-prompt-icon">{icon}</span>
-                                    {text}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
                 <div className="chat-messages">
+                    {showGraph && graphData && (
+                        <div className="message-ai">
+                            <GraphDisplay graphData={graphData} />
+                        </div>
+                    )}
+                    
                     {messages.map((msg, i) => (
                         <div
                             key={i}
@@ -447,23 +219,8 @@ export default function ChatDashboard() {
 
                 <div className="chat-input-bar">
                     <input
-                        type="file"
-                        ref={fileInputRef}
-                        style={{ display: "none" }}
-                        accept=".csv,.tsv,.xlsx,.xls,.txt,.json,.parquet,.feather"
-                        onChange={handleFileUpload}
-                    />
-                    <button
-                        className="chat-upload-button"
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={isUploading}
-                    >
-                        {isUploading ? "..." : "+"}
-                    </button>
-
-                    <input
                         className="chat-input"
-                        placeholder="Send a message..."
+                        placeholder="Ask a question about your data..."
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={(e) => {
