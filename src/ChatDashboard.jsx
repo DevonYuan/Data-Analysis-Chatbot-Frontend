@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { sendMessage, getMessages, getGraphData } from "./api/messages";
+import { getDatasetMetadata } from "./api/chats";
 import GraphDisplay from "./GraphDisplay";
 import { getUserProfile } from "./api/auth";
 import { useNavigate, useParams } from "react-router-dom";
@@ -44,6 +45,7 @@ export default function ChatDashboard() {
     const [input, setInput] = useState("");
     const [showGraph, setShowGraph] = useState(false);
     const [graphData, setGraphData] = useState(null);
+    const [datasetMetadata, setDatasetMetadata] = useState(null);
     const navigate = useNavigate();
     const [rateLimitError, setRateLimitError] = useState(null);
     const [firstName, setFirstName] = useState("");
@@ -153,8 +155,20 @@ export default function ChatDashboard() {
             }
         }
 
+        async function loadDatasetMetadata() {
+            try {
+                const meta = await getDatasetMetadata(requestedChat);
+                if (requestedChatRef.current === requestedChat && !meta.error) {
+                    setDatasetMetadata(meta);
+                }
+            } catch (error) {
+                console.error("Failed to load dataset metadata:", error);
+            }
+        }
+
         loadMessages();
         loadInitialGraph();
+        loadDatasetMetadata();
 
         // We return an empty cleanup function because we cannot abort the fetch request.
         // But we can note that if the component unmounts, the request might still complete and then be ignored by the check above.
@@ -186,8 +200,45 @@ export default function ChatDashboard() {
                 </div>
             </header>
 
-            {/* MAIN PANEL */}
-            <main className="chat-interface-main">
+            {/* BODY (SIDEBAR + MAIN) */}
+            <div className="chat-interface-body">
+                {/* SIDEBAR */}
+                <aside className="chat-interface-sidebar">
+                    <div className="sidebar-section">
+                        <h2 className="sidebar-title">Dataset Details</h2>
+                        <div className="sidebar-meta">
+                            <span className="meta-label">Name</span>
+                            <span className="meta-value">{datasetMetadata?.name || "Loading..."}</span>
+                        </div>
+                        <div className="sidebar-meta">
+                            <span className="meta-label">Type</span>
+                            <span className="meta-value">{datasetMetadata?.type || "-"}</span>
+                        </div>
+                        <div className="sidebar-meta">
+                            <span className="meta-label">Size</span>
+                            <span className="meta-value">{datasetMetadata?.size || "-"}</span>
+                        </div>
+                    </div>
+                    
+                    <div className="sidebar-section sidebar-columns-section">
+                        <h3 className="sidebar-subtitle">Columns</h3>
+                        {datasetMetadata?.columns ? (
+                            <ul className="sidebar-columns-list">
+                                {Object.entries(datasetMetadata.columns).map(([colName, rows]) => (
+                                    <li key={colName} className="sidebar-column-item">
+                                        <span className="sidebar-column-name">{colName}</span>
+                                        <span className="sidebar-column-rows">{rows} rows</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <div className="sidebar-loading">Loading columns...</div>
+                        )}
+                    </div>
+                </aside>
+
+                {/* MAIN PANEL */}
+                <main className="chat-interface-main">
 
                 <div className="chat-interface-3d">
                     <Canvas camera={{ position: [0, 0, 7], fov: 60 }}>
@@ -233,6 +284,7 @@ export default function ChatDashboard() {
                     <button className="chat-send-button" onClick={handleSend} disabled={isSending}>→</button>
                 </div>
             </main>
+            </div>
         </div>
     );
 }
